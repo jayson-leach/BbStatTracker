@@ -2,7 +2,7 @@ body {
   background: #f9fafb;
   font-family: 'Inter', sans-serif;
   color: #111827;
-  margin: 50px;
+  margin: 0;
   padding: 0;
 }
 
@@ -52,7 +52,9 @@ button {
   border-radius: 0.5rem;
   cursor: pointer;
   transition: 0.2s ease;
-  margin: 3px
+  margin: 3px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 button:disabled {
@@ -85,6 +87,7 @@ button:hover:not(:disabled) {
   display: flex;
   gap: 2rem;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 table {
@@ -92,18 +95,14 @@ table {
   border-collapse: collapse;
   font-size: 0.95rem;
   margin-top: 1rem;
+  overflow-x: auto;
+  display: block;
 }
 
-th {
-  background: #f3f4f6;
+th, td {
   padding: 0.75rem;
   border-bottom: 1px solid #e5e7eb;
-}
-
-td {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f3f4f6;
+  text-align: center;
 }
 
 .play-by-play-box {
@@ -123,4 +122,32 @@ td {
 
 .text-center {
   text-align: center;
+}
+
+/* --- Responsive styles for mobile --- */
+@media (max-width: 600px) {
+  .container, .card {
+    padding: 0.5rem;
+    margin: 0.5rem;
+  }
+  h1, h2, h3 {
+    font-size: 1.1rem;
+  }
+  .lineup-grid, .team-select {
+    flex-direction: column !important;
+    gap: 0.5rem;
+  }
+  table, th, td {
+    font-size: 0.85rem;
+    padding: 0.3rem;
+  }
+  button {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.8rem;
+    min-width: 100px;
+  }
+  .play-log {
+    font-size: 0.95rem;
+    padding: 0.5rem;
+  }
 }

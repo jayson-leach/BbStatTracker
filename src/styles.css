@@ -3,7 +3,7 @@ body {
   font-family: 'Inter', sans-serif;
   color: #111827;
   margin: 0;
-  padding: 0;
+  padding: auto;
 }
 
 .container {
@@ -53,8 +53,6 @@ button {
   cursor: pointer;
   transition: 0.2s ease;
   margin: 3px;
-  min-width: 120px;
-  max-width: 220px;
   display: inline-block;
 }
 
@@ -148,7 +146,7 @@ th, td {
     min-width: 90px;
     max-width: 100%;
     margin: 2px 0;
-    display: block;
+    display: inline-block;
     width: auto;
   }
   .play-log {

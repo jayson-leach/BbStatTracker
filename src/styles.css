@@ -53,8 +53,9 @@ button {
   cursor: pointer;
   transition: 0.2s ease;
   margin: 3px;
-  width: 100%;
-  box-sizing: border-box;
+  min-width: 120px;
+  max-width: 220px;
+  display: inline-block;
 }
 
 button:disabled {
@@ -143,8 +144,12 @@ th, td {
   }
   button {
     font-size: 0.95rem;
-    padding: 0.5rem 0.8rem;
-    min-width: 100px;
+    padding: 0.4rem 0.7rem;
+    min-width: 90px;
+    max-width: 100%;
+    margin: 2px 0;
+    display: block;
+    width: auto;
   }
   .play-log {
     font-size: 0.95rem;

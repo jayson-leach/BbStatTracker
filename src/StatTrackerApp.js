@@ -48,7 +48,7 @@ export default function StatTrackerApp() {
           const team = row.Team?.trim();
           const player = {
             'Player Name': row['Player Name']?.trim(),
-            Number: Number(row.Number || ''),
+            Number: row.Number || '',
           };
           if (!team || !player['Player Name']) return;
           if (!teamMap[team]) teamMap[team] = [];

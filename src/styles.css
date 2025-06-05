@@ -95,7 +95,7 @@ table {
   font-size: 0.95rem;
   margin-top: 1rem;
   overflow-x: auto;
-  display: block;
+  display: auto;
 }
 
 th, td {

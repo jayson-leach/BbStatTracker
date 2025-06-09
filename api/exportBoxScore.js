@@ -8,21 +8,29 @@ const supabase = createClient(
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Only POST allowed' });
+    return res.status(405).json({ message: 'Only POST requests allowed' });
   }
 
   const boxScoreData = req.body;
 
   try {
+    if (!Array.isArray(boxScoreData)) {
+      console.error('Invalid data format:', boxScoreData);
+      return res.status(400).json({ message: 'Box score must be an array' });
+    }
+
     const { error } = await supabase
       .from('box_scores')
-      .insert(boxScoreData); // expects array of row objects
+      .insert(boxScoreData);
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return res.status(500).json({ message: 'Failed to insert into database' });
+    }
 
     return res.status(200).json({ message: 'Box score exported successfully' });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Failed to export box score' });
+    console.error('Unexpected error in exportBoxScore API:', err);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 }

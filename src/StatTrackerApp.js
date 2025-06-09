@@ -557,11 +557,11 @@ function formatStatsForExport(stats, rosters, gameId) {
       <br />
 
       <div>
-      {actionButtons.map(btn => (
+      {!selectedStat && actionButtons.map(btn => (
       <button
-      key={btn.label}
-      onClick={() => setSelectedStat(btn)}
-      style={{
+        key={btn.label}
+        onClick={() => setSelectedStat(btn)}
+        style={{
         ...getActionButtonStyle(btn),
         marginRight: 8,
         marginBottom: 8,
@@ -571,9 +571,9 @@ function formatStatsForExport(stats, rosters, gameId) {
         fontSize: '1rem',
         cursor: 'pointer',
         outline: selectedStat && selectedStat.label === btn.label ? '2px solid #000' : undefined,
-      }}
+        }}
       >
-      {btn.label}
+        {btn.label}
       </button>
       ))}
       </div>

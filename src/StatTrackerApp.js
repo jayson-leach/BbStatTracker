@@ -116,7 +116,7 @@ export default function StatTrackerApp() {
       <p>Select Event</p>
     <Select
       options={[
-        // { value: 'box_scores_section_7', label: 'Section 7 - 2025' },
+        { value: 'box_scores_section_7', label: 'Section 7 - 2025' },
         { value: 'box_scores_test', label: 'Test' },
         { value: 'box_scores_test2', label: 'Test2' }
       ]}

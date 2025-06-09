@@ -156,7 +156,7 @@ export default function StatTrackerApp() {
         <input
         type="number"
         min={1}
-        max={15}
+        max={30}
         style={{ fontSize: '1rem', padding: '0.5rem 1rem', width: 120 }}
         value={matchup.court || ''}
         onChange={e => setMatchup(prev => ({ ...prev, court: e.target.value ? Number(e.target.value) : '' }))}

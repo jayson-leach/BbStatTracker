@@ -11,17 +11,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Only POST requests allowed' });
   }
 
-  const boxScoreData = req.body;
+    const { rows, eventKey } = req.body;
+    const table = eventKey || 'box_scores';
 
   try {
-    if (!Array.isArray(boxScoreData)) {
-      console.error('Invalid data format:', boxScoreData);
+    if (!Array.isArray(rows)) {
+      console.error('Invalid data format:', rows);
       return res.status(400).json({ message: 'Box score must be an array' });
     }
 
     const { error } = await supabase
-      .from('box_scores_test')
-      .insert(boxScoreData);
+      .from(table)
+      .insert(rows);
 
     if (error) {
       console.error('Supabase insert error:', error);

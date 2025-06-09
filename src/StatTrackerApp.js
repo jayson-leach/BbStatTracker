@@ -10,6 +10,7 @@ export default function StatTrackerApp() {
   const [rosters, setRosters] = useState({});
   const [matchup, setMatchup] = useState({ home: '', away: '' });
   const [teams, setTeams] = useState({ teamA: [], teamB: [] });
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
 // Tracks the history of stat changes for undo functionality
   const [history, setHistory] = useState([]);
@@ -111,6 +112,21 @@ export default function StatTrackerApp() {
       <div>
       <h1>Select Matchup</h1>
       <div>
+        <div className="event-select-container">
+      <h3>Select Event</h3>
+    <Select
+      options={[
+        { value: 'box_scores_section_7', label: 'Section 7 - 2025' },
+        { value: 'box_scores_test', label: 'Test' },
+        { value: 'box_scores_test2', label: 'Test2' }
+      ]}
+      value={selectedEvent}
+      onChange={(option) => setSelectedEvent(option)}
+      placeholder="Choose an event..."
+    />
+    </div>
+        <br />
+
         <p>Home Team</p>
         <Select
         options={teamOptions}
@@ -804,7 +820,7 @@ function formatStatsForExport(stats, rosters, gameId) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formattedStats),
+        body: JSON.stringify({ rows: formattedStats, eventKey: selectedEvent?.value }),
       });
 
       const result = await response.json();

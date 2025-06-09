@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     }
 
     const { error } = await supabase
-      .from('box_scores')
+      .from('box_scores_test')
       .insert(boxScoreData);
 
     if (error) {

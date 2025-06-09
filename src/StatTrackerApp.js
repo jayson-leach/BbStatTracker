@@ -113,7 +113,7 @@ export default function StatTrackerApp() {
       <h1>Select Matchup</h1>
       <div>
         <div className="event-select-container">
-      <h3>Select Event</h3>
+      <p>Select Event</p>
     <Select
       options={[
         { value: 'box_scores_section_7', label: 'Section 7 - 2025' },

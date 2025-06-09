@@ -421,7 +421,7 @@ export default function StatTrackerApp() {
   for (const [name, s] of Object.entries(stats)) {
     const team = playerTeamMap[name] || 'Unknown';
     rows.push([
-      team, name, playerNumberMap[name] ?? -1, // Use -1 if number is not found
+      team, name, playerNumberMap[name] ?? null, // Use null if number is not found
       s.points,
       s.fgMade, s.fgAttempted,
       s.threeMade, s.threeAttempted,
@@ -451,7 +451,7 @@ export default function StatTrackerApp() {
   Object.entries(teamSums).forEach(([team, totals]) => {
     rows.push([
       team,
-      'TOTAL', -1, // No player name or number for totals
+      'TOTAL', null, // No player name or number for totals
       totals.points,
       totals.fgMade, totals.fgAttempted,
       totals.threeMade, totals.threeAttempted,
@@ -483,7 +483,7 @@ function formatStatsForExport(stats, rosters, gameId) {
 
     Object.entries(teamStats).forEach(([playerName, playerStats]) => {
       const playerInfo = teamRoster.find(p => p['Player Name'] === playerName) || {};
-      const number = playerInfo.Number || -1; // Use -1 if number is not found
+      const number = playerInfo.Number || null; 
 
       allStats.push({
         game_id: gameId,

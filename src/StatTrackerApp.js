@@ -483,7 +483,7 @@ function formatStatsForExport(stats, rosters, gameId) {
 
     Object.entries(teamStats).forEach(([playerName, playerStats]) => {
       const playerInfo = teamRoster.find(p => p['Player Name'] === playerName) || {};
-      const number = playerInfo.Number || '';
+      const number = playerInfo.Number || -1; // Use -1 if number is not found
 
       allStats.push({
         game_id: gameId,

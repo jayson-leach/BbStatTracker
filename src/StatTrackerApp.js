@@ -478,35 +478,38 @@ export default function StatTrackerApp() {
 function formatStatsForExport(stats, rosters, gameId) {
   const allStats = [];
 
-  Object.entries(stats).forEach(([teamKey, teamStats]) => {
-    const teamRoster = rosters[teamKey] || [];
+  Object.entries(stats).forEach(([playerName, playerStats]) => {
+    // Find which team this player belongs to
+    let teamKey = null;
+    let number = null;
+    for (const [key, roster] of Object.entries(rosters)) {
+      const player = roster.find(p => p['Player Name'] === playerName);
+      if (player) {
+        teamKey = key;
+        number = player.Number || null;
+        break;
+      }
+    }
 
-    Object.entries(teamStats).forEach(([playerName, playerStats]) => {
-      const playerInfo = teamRoster.find(p => p['Player Name'] === playerName) || {};
-      const number = playerInfo.Number || null; 
-      
-      console.log(`Exporting stats for ${playerName} (${teamKey}):`, playerStats);
-
-      allStats.push({
-        game_id: gameId,
-        team: teamKey,
-        name: playerName,
-        number: number,
-        points: playerStats.points || 0,
-        fg_made: playerStats.fg_made || 0,
-        fg_att: playerStats.fg_att || 0,
-        '3pt_made': playerStats['3pt_made'] || 0,
-        '3pt_att': playerStats['3pt_att'] || 0,
-        ft_made: playerStats.ft_made || 0,
-        ft_att: playerStats.ft_att || 0,
-        off_reb: playerStats.off_reb || 0,
-        def_reb: playerStats.def_reb || 0,
-        assists: playerStats.assists || 0,
-        steals: playerStats.steals || 0,
-        blocks: playerStats.blocks || 0,
-        fouls: playerStats.fouls || 0,
-        turnovers: playerStats.turnovers || 0,
-      });
+    allStats.push({
+      game_id: gameId,
+      team: teamKey,
+      name: playerName,
+      number: number,
+      points: playerStats.points || 0,
+      fgMade: playerStats.fgMade || 0,
+      fgAttempted: playerStats.fgAttempted || 0,
+      threeMade: playerStats.threeMade || 0,
+      threeAttempted: playerStats.threeAttempted || 0,
+      ftMade: playerStats.ftMade || 0,
+      ftAttempted: playerStats.ftAttempted || 0,
+      offRebounds: playerStats.offRebounds || 0,
+      defRebounds: playerStats.defRebounds || 0,
+      assists: playerStats.assists || 0,
+      steals: playerStats.steals || 0,
+      blocks: playerStats.blocks || 0,
+      fouls: playerStats.fouls || 0,
+      turnovers: playerStats.turnovers || 0,
     });
   });
 

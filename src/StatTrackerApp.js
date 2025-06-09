@@ -795,6 +795,8 @@ function formatStatsForExport(stats, rosters, gameId) {
 
       const formattedStats = formatStatsForExport(stats, rosters, gameId);
 
+      console.log('Formatted payload example:', formattedStats[0]);
+
       const response = await fetch('/api/exportBoxScore', {
         method: 'POST',
         headers: {

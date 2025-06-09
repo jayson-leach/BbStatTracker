@@ -153,11 +153,14 @@ export default function StatTrackerApp() {
         <br />
         <br />
         <p>Court Number</p>
-        <Select
-        options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(num => ({ value: num, label: `${num}` }))}
-        value={matchup.court ? { value: matchup.court, label: `${matchup.court}` } : null}
-        onChange={opt => setMatchup(prev => ({ ...prev, court: opt?.value || '' }))}
-        placeholder="Select court number"
+        <input
+        type="number"
+        min={1}
+        max={15}
+        style={{ fontSize: '1rem', padding: '0.5rem 1rem', width: 120 }}
+        value={matchup.court || ''}
+        onChange={e => setMatchup(prev => ({ ...prev, court: e.target.value ? Number(e.target.value) : '' }))}
+        placeholder="Court #"
         />
       </div>
       <br />

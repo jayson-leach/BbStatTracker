@@ -789,9 +789,6 @@ function formatStatsForExport(stats, rosters, gameId) {
       })}
       </div>
       <br />
-      <button onClick={downloadBoxScoreToCSV}>
-      Download Box Score
-      </button>
       <button
   className="export-button"
   onClick={async () => {
@@ -820,7 +817,9 @@ function formatStatsForExport(stats, rosters, gameId) {
 >
   Export Box Score
 </button>
-
+<button onClick={downloadBoxScoreToCSV}>
+      Download Box Score
+      </button>
       </div>
       </div>
     );

@@ -389,7 +389,7 @@ export default function StatTrackerApp() {
     return totals;
   };
 
-  const exportBoxScoreToCSV = () => {
+  const downloadBoxScoreToCSV = () => {
   if (!stats || Object.keys(stats).length === 0) return;
 
   const headers = [
@@ -474,6 +474,43 @@ export default function StatTrackerApp() {
 
   URL.revokeObjectURL(url);
 };
+
+function formatStatsForExport(stats, rosters, gameId) {
+  const allStats = [];
+
+  Object.entries(stats).forEach(([teamKey, teamStats]) => {
+    const teamRoster = rosters[teamKey] || [];
+
+    Object.entries(teamStats).forEach(([playerName, playerStats]) => {
+      const playerInfo = teamRoster.find(p => p['Player Name'] === playerName) || {};
+      const number = playerInfo.Number || '';
+
+      allStats.push({
+        game_id: gameId,
+        team: teamKey,
+        name: playerName,
+        number: number,
+        points: playerStats.points || 0,
+        fg_made: playerStats.fg_made || 0,
+        fg_att: playerStats.fg_att || 0,
+        '3pt_made': playerStats['3pt_made'] || 0,
+        '3pt_att': playerStats['3pt_att'] || 0,
+        ft_made: playerStats.ft_made || 0,
+        ft_att: playerStats.ft_att || 0,
+        off_reb: playerStats.off_reb || 0,
+        def_reb: playerStats.def_reb || 0,
+        assists: playerStats.assists || 0,
+        steals: playerStats.steals || 0,
+        blocks: playerStats.blocks || 0,
+        fouls: playerStats.fouls || 0,
+        turnovers: playerStats.turnovers || 0,
+      });
+    });
+  });
+
+  return allStats;
+}
+
 
     // Helper to get button color based on stat type/label
     const getActionButtonStyle = (btn) => {
@@ -747,9 +784,36 @@ export default function StatTrackerApp() {
       })}
       </div>
       <br />
-      <button onClick={exportBoxScoreToCSV}>
-      Export Box Score
+      <button onClick={downloadBoxScoreToCSV}>
+      Download Box Score
       </button>
+      <button
+  className="export-button"
+  onClick={async () => {
+    try {
+      const gameId = `${matchup.home}_${matchup.away}_${matchup.date}_court${matchup.court}`;
+
+      const formattedStats = formatStatsForExport(stats, rosters, gameId);
+
+      const response = await fetch('/api/exportBoxScore', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formattedStats),
+      });
+
+      const result = await response.json();
+      alert(result.message);
+    } catch (err) {
+      console.error('Export failed', err);
+      alert('Failed to export box score');
+    }
+  }}
+>
+  Export Box Score
+</button>
+
       </div>
       </div>
     );

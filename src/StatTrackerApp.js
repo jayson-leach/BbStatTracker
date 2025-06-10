@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
-import Papa from 'papaparse';
 import './styles.css';
-import rosterCSV from './roster.csv';
+
+// Remove CSV imports
+// import rosterCSV from './roster.csv';
+// import teamCSV from './teams.csv';
 
 export default function StatTrackerApp() {
   const [stage, setStage] = useState('matchup');
@@ -38,26 +40,50 @@ export default function StatTrackerApp() {
     }
   }, [stage]);
 
-  // Fetch and parse the roster CSV file
+  // Fetch teams and rosters from Supabase
   useEffect(() => {
-    fetch(rosterCSV)
-      .then((res) => res.text())
-      .then((csvText) => {
-        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-        const teamMap = {};
-        parsed.data.forEach((row) => {
-          const team = row.Team?.trim();
-          const player = {
-            'Player Name': row['Player Name']?.trim(),
-            Number: row.Number || '',
-          };
-          if (!team || !player['Player Name']) return;
-          if (!teamMap[team]) teamMap[team] = [];
-          teamMap[team].push(player);
-        });
-        setRosters(teamMap);
-        setTeamNames(Object.keys(teamMap));
+    async function fetchData() {
+      // Fetch teams
+      const teamRes = await fetch('/api/getTeams');
+      const teamData = await teamRes.json();
+      // Format: [{ team: 'Lincoln', gender: 'Boys' }, ...]
+      const teamList = [];
+      teamData.forEach(row => {
+        const baseName = row.team?.trim();
+        const gender = row.gender?.trim();
+        if (!baseName || !gender) return;
+        const teamName = `${baseName} - ${gender}`;
+        if (!teamList.includes(teamName)) teamList.push(teamName);
       });
+
+      // Fetch roster
+      const rosterRes = await fetch('/api/getRoster');
+      const rosterData = await rosterRes.json();
+      // Format: [{ team: 'Lincoln', gender: 'Boys', player_name: 'John', number: '12' }, ...]
+      const teamMap = {};
+      rosterData.forEach(row => {
+        const baseName = row.team?.trim();
+        const gender = row.gender?.trim();
+        const player = {
+          'Player Name': row.player_name?.trim(),
+          Number: row.number || '',
+        };
+        if (!baseName || !gender || !player['Player Name']) return;
+        const teamName = `${baseName} - ${gender}`;
+        if (!teamMap[teamName]) teamMap[teamName] = [];
+        teamMap[teamName].push(player);
+        if (!teamList.includes(teamName)) teamList.push(teamName);
+      });
+
+      // Ensure all teams exist in teamMap
+      teamList.forEach(teamName => {
+        if (!teamMap[teamName]) teamMap[teamName] = [];
+      });
+
+      setRosters(teamMap);
+      setTeamNames(teamList);
+    }
+    fetchData();
   }, []);
 
   // Handle matchup confirmation and set teams for tracking
@@ -247,35 +273,129 @@ export default function StatTrackerApp() {
       <p>You must select 5 players for each team to start tracking stats.</p>
 
       {['teamA', 'teamB'].map(teamKey => (
-        <div key={teamKey}>
-        <h2>{teamKey === 'teamA' ? matchup.home : matchup.away}</h2>
-        <h3>Selected: {starterSelection[teamKey].length}/5</h3>
-        <br />
-        <div>
-          {teams[teamKey].map(player => (
-          <button
-            key={player['Player Name']}
-            className={`toggle-starter-button ${starterSelection[teamKey].includes(player) ? 'active' : ''}`}
-            onClick={() => toggleStarter(teamKey, player)}
-          >
-            #{player.Number} {player['Player Name']}
-          </button>
-          ))}
-        </div>
-        
-        </div>
+      <div key={teamKey}>
+      <div style={{alignItems: 'center', gap: 12 }}>
+      <h2>{teamKey === 'teamA' ? matchup.home : matchup.away}</h2>
+      <br />
+      <AddPlayerButton
+      teamKey={teamKey}
+      teamName={teamKey === 'teamA' ? matchup.home : matchup.away}
+      onAdd={(player) => {
+        // Prevent adding if name or number is missing
+        if (!player['Player Name'] || !player.Number) return;
+        setTeams(prev => ({
+        ...prev,
+        [teamKey]: [...prev[teamKey], player]
+        }));
+        setRosters(prev => ({
+        ...prev,
+        [teamKey === 'teamA' ? matchup.home : matchup.away]: [
+        ...(prev[teamKey === 'teamA' ? matchup.home : matchup.away] || []),
+        player
+        ]
+        }));
+        setStarterSelection(prev => {
+        if (prev[teamKey].length < 5) {
+        return {
+        ...prev,
+        [teamKey]: [...prev[teamKey], player]
+        };
+        }
+        return prev;
+        });
+        // Drop ' - Boys' or ' - Girls' from team name for backend
+        const fullTeamName = teamKey === 'teamA' ? matchup.home : matchup.away;
+        let baseName = fullTeamName;
+        let gender = '';
+        if (fullTeamName.includes(' - ')) {
+          [baseName, gender] = fullTeamName.split(' - ');
+        }
+        fetch('/api/addPlayerToRoster', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            team: baseName.trim(),
+            gender: gender.trim(),
+            player
+          })
+        }).catch(() => {});
+      }}
+      />
+      </div>
+      <h3>Selected: {starterSelection[teamKey].length}/5</h3>
+      <br />
+      <div>
+      {teams[teamKey].map(player => (
+      <button
+        key={player['Player Name']}
+        className={`toggle-starter-button ${starterSelection[teamKey].includes(player) ? 'active' : ''}`}
+        onClick={() => toggleStarter(teamKey, player)}
+      >
+        #{player.Number} {player['Player Name']}
+      </button>
+      ))}
+      </div>
+      </div>
       ))}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24 }}>
-        <button onClick={confirmStarters}>
-        Confirm Starters
-        </button>
-        <button onClick={() => setStage('matchup')}>
-        Back to Matchup
-        </button>
+      <button onClick={confirmStarters}>
+      Confirm Starters
+      </button>
+      <button onClick={() => setStage('matchup')}>
+      Back to Matchup
+      </button>
       </div>
       </div>
     );
+
+    function AddPlayerButton({ teamKey, teamName, onAdd }) {
+      const [show, setShow] = useState(false);
+      const [name, setName] = useState('');
+      const [number, setNumber] = useState('');
+      return (
+      <>
+        <button onClick={() => setShow(s => !s)}>
+        Add Player
+        </button>
+        {show && (
+        <div style={{ display: 'inline-block', marginLeft: 8 }}>
+          <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          style={{ marginRight: 4 }}
+          />
+          <input
+          type="text"
+          placeholder="Number"
+          value={number}
+          onChange={e => setNumber(e.target.value)}
+          style={{ marginRight: 4, width: 50 }}
+          />
+          <button
+          onClick={() => {
+            if (!name.trim()) return;
+            onAdd({
+            'Player Name': name.trim(),
+            Number: number.trim()
+            });
+            setName('');
+            setNumber('');
+            setShow(false);
+          }}
+          >
+          Save
+          </button>
+          <button onClick={() => setShow(false)} style={{ marginLeft: 4 }}>
+          Cancel
+          </button>
+        </div>
+        )}
+      </>
+      );
+    }
   }
 
   const actionButtons = [

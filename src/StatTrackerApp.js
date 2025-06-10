@@ -143,8 +143,7 @@ export default function StatTrackerApp() {
     <Select
       options={[
         { value: 'box_scores_section_7', label: 'Section 7 - 2025' },
-        { value: 'box_scores_test', label: 'Test' },
-        { value: 'box_scores_test2', label: 'Test2' }
+        { value: 'box_scores_test', label: 'Test' }
       ]}
       value={selectedEvent}
       onChange={(option) => setSelectedEvent(option)}

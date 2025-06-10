@@ -313,8 +313,8 @@ export default function StatTrackerApp() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        team: baseName.trim(),
-        gender: gender.trim(),
+        Team: baseName.trim(),
+        Gender: gender.trim(),
         player
       })
     });

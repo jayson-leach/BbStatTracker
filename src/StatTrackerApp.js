@@ -46,7 +46,6 @@ export default function StatTrackerApp() {
       // Fetch teams
       const teamRes = await fetch('/api/getTeams');
       const teamData = await teamRes.json();
-      console.log('Fetched teams:', teamData);
       // Format: [{ team: 'Lincoln', gender: 'Boys' }, ...]
       const teamList = [];
       teamData.forEach(row => {
@@ -60,7 +59,6 @@ export default function StatTrackerApp() {
       // Fetch roster
       const rosterRes = await fetch('/api/getRoster');
       const rosterData = await rosterRes.json();
-      console.log(rosterData);
       // Format: [{ team: 'Lincoln', gender: 'Boys', player_name: 'John', number: '12' }, ...]
       const teamMap = {};
       rosterData.forEach(row => {
@@ -76,6 +74,7 @@ export default function StatTrackerApp() {
         teamMap[teamName].push(player);
         if (!teamList.includes(teamName)) teamList.push(teamName);
       });
+      console.log('teamList:', teamList);
 
       // Ensure all teams exist in teamMap
       teamList.forEach(teamName => {

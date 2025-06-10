@@ -21,10 +21,10 @@ export default async function handler(req, res) {
     const { data: existing, error: selectError } = await supabase
       .from('roster')
       .select('*')
-      .eq('team', team)
-      .eq('gender', gender)
-      .eq('player_name', player['Player Name'])
-      .eq('number', player.Number);
+      .eq('Team', team)
+      .eq('Gender', gender)
+      .eq('Player Name', player['Player Name'])
+      .eq('Number', player.Number);
 
     if (selectError) {
       return res.status(500).json({ message: 'Database error (select)' });

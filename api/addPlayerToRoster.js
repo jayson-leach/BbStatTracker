@@ -10,6 +10,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Only POST requests allowed' });
   }
 
+  console.log('Received request body:', req.body);
   const { team, gender, player } = req.body;
   if (!team || !gender || !player || !player['Player Name'] || !player.Number) {
     return res.status(400).json({ message: 'Missing required fields' });

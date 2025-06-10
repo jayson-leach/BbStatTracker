@@ -38,10 +38,10 @@ export default async function handler(req, res) {
       .from('roster')
       .insert([
         {
-          team,
-          gender,
-          player_name: player['Player Name'],
-          number: player.Number
+          Team,
+          Gender,
+          'Player Name': player['Player Name'],
+          Number: player.Number
         }
       ]);
 

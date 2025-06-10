@@ -46,6 +46,7 @@ export default function StatTrackerApp() {
       // Fetch teams
       const teamRes = await fetch('/api/getTeams');
       const teamData = await teamRes.json();
+      console.log('Fetched teams:', teamData);
       // Format: [{ team: 'Lincoln', gender: 'Boys' }, ...]
       const teamList = [];
       teamData.forEach(row => {

@@ -315,7 +315,7 @@ export default function StatTrackerApp() {
       body: JSON.stringify({
         Team: baseName.trim(),
         Gender: gender.trim(),
-        player
+        Player: player
       })
     });
     // Re-fetch roster from Supabase and update state

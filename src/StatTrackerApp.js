@@ -278,49 +278,72 @@ export default function StatTrackerApp() {
       <h2>{teamKey === 'teamA' ? matchup.home : matchup.away}</h2>
       <br />
       <AddPlayerButton
-      teamKey={teamKey}
-      teamName={teamKey === 'teamA' ? matchup.home : matchup.away}
-      onAdd={(player) => {
-        // Prevent adding if name or number is missing
-        if (!player['Player Name'] || !player.Number) return;
-        setTeams(prev => ({
-        ...prev,
-        [teamKey]: [...prev[teamKey], player]
-        }));
-        setRosters(prev => ({
-        ...prev,
-        [teamKey === 'teamA' ? matchup.home : matchup.away]: [
+  teamKey={teamKey}
+  teamName={teamKey === 'teamA' ? matchup.home : matchup.away}
+  onAdd={async (player) => {
+    if (!player['Player Name'] || !player.Number) return;
+    setTeams(prev => ({
+      ...prev,
+      [teamKey]: [...prev[teamKey], player]
+    }));
+    setRosters(prev => ({
+      ...prev,
+      [teamKey === 'teamA' ? matchup.home : matchup.away]: [
         ...(prev[teamKey === 'teamA' ? matchup.home : matchup.away] || []),
         player
-        ]
-        }));
-        setStarterSelection(prev => {
-        if (prev[teamKey].length < 5) {
+      ]
+    }));
+    setStarterSelection(prev => {
+      if (prev[teamKey].length < 5) {
         return {
-        ...prev,
-        [teamKey]: [...prev[teamKey], player]
+          ...prev,
+          [teamKey]: [...prev[teamKey], player]
         };
-        }
-        return prev;
-        });
-        // Drop ' - Boys' or ' - Girls' from team name for backend
-        const fullTeamName = teamKey === 'teamA' ? matchup.home : matchup.away;
-        let baseName = fullTeamName;
-        let gender = '';
-        if (fullTeamName.includes(' - ')) {
-          [baseName, gender] = fullTeamName.split(' - ');
-        }
-        fetch('/api/addPlayerToRoster', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            team: baseName.trim(),
-            gender: gender.trim(),
-            player
-          })
-        }).catch(() => {});
-      }}
-      />
+      }
+      return prev;
+    });
+    // Drop ' - Boys' or ' - Girls' from team name for backend
+    const fullTeamName = teamKey === 'teamA' ? matchup.home : matchup.away;
+    let baseName = fullTeamName;
+    let gender = '';
+    if (fullTeamName.includes(' - ')) {
+      [baseName, gender] = fullTeamName.split(' - ');
+    }
+    await fetch('/api/addPlayerToRoster', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        team: baseName.trim(),
+        gender: gender.trim(),
+        player
+      })
+    });
+    // Re-fetch roster from Supabase and update state
+    const rosterRes = await fetch('/api/getRoster');
+    const rosterData = await rosterRes.json();
+    const teamMap = {};
+    rosterData.forEach(row => {
+      const baseName = row.team?.trim();
+      const gender = row.gender?.trim();
+      const playerObj = {
+        'Player Name': row.player_name?.trim(),
+        Number: row.number || '',
+      };
+      if (!baseName || !gender || !playerObj['Player Name']) return;
+      const teamName = `${baseName} - ${gender}`;
+      if (!teamMap[teamName]) teamMap[teamName] = [];
+      teamMap[teamName].push(playerObj);
+    });
+    setRosters(teamMap);
+    // Optionally update teams if needed
+    if (teamMap[fullTeamName]) {
+      setTeams(prev => ({
+        ...prev,
+        [teamKey]: teamMap[fullTeamName]
+      }));
+    }
+  }}
+/>
       </div>
       <h3>Selected: {starterSelection[teamKey].length}/5</h3>
       <br />

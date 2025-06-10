@@ -27,6 +27,7 @@ export default async function handler(req, res) {
       .eq('Number', player.Number);
 
     if (selectError) {
+      console.error('Supabase select error:', selectError);
       return res.status(500).json({ message: 'Database error (select)' });
     }
 
@@ -38,19 +39,21 @@ export default async function handler(req, res) {
       .from('roster')
       .insert([
         {
-          Team,
-          Gender,
+          Team: team,
+          Gender: gender,
           'Player Name': player['Player Name'],
           Number: player.Number
         }
       ]);
 
     if (error) {
-      return res.status(500).json({ message: 'Failed to add player' });
+      console.error('Supabase insert error:', error);
+      return res.status(500).json({ message: 'Failed to add player', error });
     }
 
     return res.status(200).json({ message: 'Player added successfully' });
   } catch (err) {
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error('Unexpected error in addPlayerToRoster:', err);
+    return res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 }

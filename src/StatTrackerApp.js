@@ -49,8 +49,8 @@ export default function StatTrackerApp() {
       // Format: [{ team: 'Lincoln', gender: 'Boys' }, ...]
       const teamList = [];
       teamData.forEach(row => {
-        const baseName = row.team?.trim();
-        const gender = row.gender?.trim();
+        const baseName = row.Team?.trim();
+        const gender = row.Gender?.trim();
         if (!baseName || !gender) return;
         const teamName = `${baseName} - ${gender}`;
         if (!teamList.includes(teamName)) teamList.push(teamName);
@@ -62,11 +62,11 @@ export default function StatTrackerApp() {
       // Format: [{ team: 'Lincoln', gender: 'Boys', player_name: 'John', number: '12' }, ...]
       const teamMap = {};
       rosterData.forEach(row => {
-        const baseName = row.team?.trim();
-        const gender = row.gender?.trim();
+        const baseName = row.Team?.trim();
+        const gender = row.Gender?.trim();
         const player = {
-          'Player Name': row.player_name?.trim(),
-          Number: row.number || '',
+          'Player Name': row['Player Name']?.trim(),
+          Number: row.Number || '',
         };
         if (!baseName || !gender || !player['Player Name']) return;
         const teamName = `${baseName} - ${gender}`;
@@ -74,7 +74,6 @@ export default function StatTrackerApp() {
         teamMap[teamName].push(player);
         if (!teamList.includes(teamName)) teamList.push(teamName);
       });
-      console.log('teamList:', teamList);
 
       // Ensure all teams exist in teamMap
       teamList.forEach(teamName => {

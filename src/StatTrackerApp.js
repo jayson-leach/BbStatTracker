@@ -123,6 +123,9 @@ export default function StatTrackerApp() {
   if (stage === 'matchup') {
     return (
       <div>
+      <header className="main-header">
+  <h1>🏀 Basketball Stat Tracker</h1>
+</header>
       <h1>Select Matchup</h1>
       <div>
         <div className="event-select-container">
@@ -696,7 +699,9 @@ function formatStatsForExport(stats, rosters, gameId) {
 
     return (
       <div>
-        <h1>Basketball Stat Tracker</h1>
+        <header className="main-header">
+  <h1>🏀 Basketball Stat Tracker</h1>
+</header>
         <div>
           <h3>Quarter: {quarter}</h3>
           <button onClick={() => setQuarter(q => Math.max(1, q - 1))}>-</button>

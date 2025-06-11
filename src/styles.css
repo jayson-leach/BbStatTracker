@@ -123,6 +123,17 @@ th, td {
   text-align: center;
 }
 
+.main-header {
+  background: #6366f1;
+  color: #fff;
+  padding: 1rem 2rem;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
 /* --- Responsive styles for mobile, with smooth scaling --- */
 @media (max-width: 1000px) {
   .container, .card {

@@ -702,9 +702,9 @@ function formatStatsForExport(stats, rosters, gameId) {
 
     return (
       <div>
-        <header className="main-header">
-          <h2>🏀 Hoop Tracker</h2>
-        </header>
+        <div className="main-header">
+          <h1>🏀 Hoop Tracker</h1>
+        </div>
         <div>
           <h3>Quarter: {quarter}</h3>
           <button onClick={() => setQuarter(q => Math.max(1, q - 1))}>-</button>
@@ -749,9 +749,6 @@ function formatStatsForExport(stats, rosters, gameId) {
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: isRight ? 'flex-end' : 'flex-start',
-                      // Make the container take up to 75% of the screen width
-                      maxWidth: '75vw',
-                      width: '100%',
                     }}
                   >
                     <h3 style={{ textAlign: isRight ? 'right' : 'left', width: '100%' }}>
@@ -763,9 +760,6 @@ function formatStatsForExport(stats, rosters, gameId) {
                         flexDirection: 'column',
                         alignItems: isRight ? 'flex-end' : 'flex-start',
                         gap: 8,
-                        // Make the button row take up to 75% of the screen width
-                        maxWidth: '75vw',
-                        width: '100%',
                       }}
                     >
                       {activePlayers[teamKey].map(p => (
@@ -774,8 +768,6 @@ function formatStatsForExport(stats, rosters, gameId) {
                             onClick={() => handleSubOutClick(teamKey, p)}
                             style={{
                               minWidth: 160,
-                              width: '100%',
-                              maxWidth: '75vw',
                               textAlign: isRight ? 'right' : 'left'
                             }}
                           >

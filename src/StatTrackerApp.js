@@ -654,7 +654,7 @@ function formatStatsForExport(stats, rosters, gameId) {
 
     allStats.push({
       game_id: gameId,
-      team: teamKey,
+      team: teamKey.split(' | ')[0], // Get team name without Boys / Girls
       name: playerName,
       number: number,
       points: playerStats.points || 0,

@@ -124,7 +124,7 @@ export default function StatTrackerApp() {
     return (
       <div>
       <header className="main-header">
-  <h1>🏀 Basketball Stat Tracker</h1>
+  <h1>🏀 Hoop Tracker</h1>
 </header>
       <h1>Select Matchup</h1>
       <div>
@@ -259,7 +259,7 @@ export default function StatTrackerApp() {
     return (
       <div>
         <header className="main-header">
-          <h1>🏀 Basketball Stat Tracker</h1>
+          <h1>🏀 Hoop Tracker</h1>
         </header>
       <h1>Select Starters</h1>
       <p>You must select 5 players for each team to start tracking stats.</p>
@@ -703,7 +703,7 @@ function formatStatsForExport(stats, rosters, gameId) {
     return (
       <div>
         <header className="main-header">
-          <h2>🏀 Basketball Stat Tracker</h2>
+          <h2>🏀 Hoop Tracker</h2>
         </header>
         <div>
           <h3>Quarter: {quarter}</h3>
@@ -748,18 +748,36 @@ function formatStatsForExport(stats, rosters, gameId) {
                       flex: 1,
                       display: 'flex',
                       flexDirection: 'column',
-                      alignItems: isRight ? 'flex-end' : 'flex-start'
+                      alignItems: isRight ? 'flex-end' : 'flex-start',
+                      // Make the container take up to 75% of the screen width
+                      maxWidth: '75vw',
+                      width: '100%',
                     }}
                   >
                     <h3 style={{ textAlign: isRight ? 'right' : 'left', width: '100%' }}>
                       {teamKey === 'teamA' ? matchup.home : matchup.away}
                     </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRight ? 'flex-end' : 'flex-start', gap: 8 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: isRight ? 'flex-end' : 'flex-start',
+                        gap: 8,
+                        // Make the button row take up to 75% of the screen width
+                        maxWidth: '75vw',
+                        width: '100%',
+                      }}
+                    >
                       {activePlayers[teamKey].map(p => (
-                        <div key={p['Player Name']}>
+                        <div key={p['Player Name']} style={{ width: '100%' }}>
                           <button
                             onClick={() => handleSubOutClick(teamKey, p)}
-                            style={{ minWidth: 160, textAlign: isRight ? 'right' : 'left' }}
+                            style={{
+                              minWidth: 160,
+                              width: '100%',
+                              maxWidth: '75vw',
+                              textAlign: isRight ? 'right' : 'left'
+                            }}
                           >
                             Sub Out #{p.Number} {p['Player Name']}
                           </button>

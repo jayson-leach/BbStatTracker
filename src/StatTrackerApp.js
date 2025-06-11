@@ -2,38 +2,27 @@ import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import './styles.css';
 
-// Remove CSV imports
-// import rosterCSV from './roster.csv';
-// import teamCSV from './teams.csv';
-
 export default function StatTrackerApp() {
+  // State variables to manage the app's stages and data
   const [stage, setStage] = useState('matchup');
   const [teamNames, setTeamNames] = useState([]);
   const [rosters, setRosters] = useState({});
   const [matchup, setMatchup] = useState({ home: '', away: '' });
   const [teams, setTeams] = useState({ teamA: [], teamB: [] });
   const [selectedEvent, setSelectedEvent] = useState(null);
-
-// Tracks the history of stat changes for undo functionality
   const [history, setHistory] = useState([]);
-// Tracks the current quarter of the game
   const [quarter, setQuarter] = useState(1);
-// Keeps track of the currently selected stat type (e.g., points, rebound)
   const [selectedStat, setSelectedStat] = useState(null);
-// Logs the play-by-play descriptions
   const [playByPlay, setPlayByPlay] = useState([]);
-// Tracks currently active players on the court for both teams
   const [activePlayers, setActivePlayers] = useState({
     teamA: [],
     teamB: []
   });
-// Tracks which player is being subbed in/out
   const [subOutPlayer, setSubOutPlayer] = useState(null);
-// Tracks which players are selected as starters
   const [starterSelection, setStarterSelection] = useState({ teamA: [], teamB: [] });
-// Controls whether the substitution menu is open
   const [subMenu, setSubMenu] = useState({ teamKey: null, outPlayer: null });
 
+  // Reset starter selection when stage changes to 'matchup'
   useEffect(() => {
     if (stage === 'matchup') {
       setStarterSelection({ teamA: [], teamB: [] });
@@ -43,7 +32,6 @@ export default function StatTrackerApp() {
   // Fetch teams and rosters from Supabase
   useEffect(() => {
     async function fetchData() {
-      // Fetch teams
       const teamRes = await fetch('/api/getTeams');
       const teamData = await teamRes.json();
       // Format: [{ team: 'Lincoln', gender: 'Boys' }, ...]
@@ -56,7 +44,6 @@ export default function StatTrackerApp() {
         if (!teamList.includes(teamName)) teamList.push(teamName);
       });
 
-      // Fetch roster
       const rosterRes = await fetch('/api/getRoster');
       const rosterData = await rosterRes.json();
       // Format: [{ team: 'Lincoln', gender: 'Boys', player_name: 'John', number: '12' }, ...]
@@ -75,7 +62,6 @@ export default function StatTrackerApp() {
         if (!teamList.includes(teamName)) teamList.push(teamName);
       });
 
-      // Ensure all teams exist in teamMap
       teamList.forEach(teamName => {
         if (!teamMap[teamName]) teamMap[teamName] = [];
       });
@@ -112,22 +98,23 @@ export default function StatTrackerApp() {
     return initial;
   });
 
+  // Reset stats when stage changes to 'starters' and teams are set
   useEffect(() => {
-  if (stage === 'starters' && teams.teamA.length && teams.teamB.length) {
-    const allPlayers = [...teams.teamA, ...teams.teamB];
-    const freshStats = {};
-    allPlayers.forEach((p) => {
-      freshStats[p['Player Name']] = {
-        points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
-        blocks: 0, fouls: 0, turnovers: 0,
-        fgMade: 0, fgAttempted: 0,
-        threeMade: 0, threeAttempted: 0,
-        ftMade: 0, ftAttempted: 0,
-      };
-    });
-    setStats(freshStats);
-  }
-}, [stage, teams]);
+    if (stage === 'starters' && teams.teamA.length && teams.teamB.length) {
+      const allPlayers = [...teams.teamA, ...teams.teamB];
+      const freshStats = {};
+      allPlayers.forEach((p) => {
+        freshStats[p['Player Name']] = {
+          points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
+          blocks: 0, fouls: 0, turnovers: 0,
+          fgMade: 0, fgAttempted: 0,
+          threeMade: 0, threeAttempted: 0,
+          ftMade: 0, ftAttempted: 0,
+        };
+      });
+      setStats(freshStats);
+    }
+  }, [stage, teams]);
 
   // Prepare team options for the select dropdown
   const teamOptions = teamNames.sort().map((name) => ({ value: name, label: name }));
@@ -709,279 +696,279 @@ function formatStatsForExport(stats, rosters, gameId) {
 
     return (
       <div>
-      <h1>Basketball Stat Tracker</h1>
-      <div>
-      <h3>Quarter: {quarter}</h3>
-      <button onClick={() => setQuarter(q => Math.max(1, q - 1))}>-</button>
-      <button onClick={() => setQuarter(q => Math.min(4, q + 1))}>+</button>
-      </div>
-      <br />
+        <h1>Basketball Stat Tracker</h1>
+        <div>
+          <h3>Quarter: {quarter}</h3>
+          <button onClick={() => setQuarter(q => Math.max(1, q - 1))}>-</button>
+          <button onClick={() => setQuarter(q => Math.min(4, q + 1))}>+</button>
+        </div>
+        <br />
 
-      <div>
-      {!selectedStat && actionButtons.map(btn => (
-      <button
-        key={btn.label}
-        onClick={() => setSelectedStat(btn)}
-        style={{
-        ...getActionButtonStyle(btn),
-        marginRight: 8,
-        marginBottom: 8,
-        padding: '0.5rem 1.2rem',
-        borderRadius: 6,
-        fontWeight: 600,
-        fontSize: '1rem',
-        cursor: 'pointer',
-        outline: selectedStat && selectedStat.label === btn.label ? '2px solid #000' : undefined,
-        }}
-      >
-        {btn.label}
-      </button>
-      ))}
-      </div>
+        <div>
+          {!selectedStat && actionButtons.map(btn => (
+            <button
+              key={btn.label}
+              onClick={() => setSelectedStat(btn)}
+              style={{
+                ...getActionButtonStyle(btn),
+                marginRight: 8,
+                marginBottom: 8,
+                padding: '0.5rem 1.2rem',
+                borderRadius: 6,
+                fontWeight: 600,
+                fontSize: '1rem',
+                cursor: 'pointer',
+                outline: selectedStat && selectedStat.label === btn.label ? '2px solid #000' : undefined,
+              }}
+            >
+              {btn.label}
+            </button>
+          ))}
+        </div>
 
-      {selectedStat && selectedStat.label === 'Substitution' && (
-      <div>
-      <h2>Select a player for: {selectedStat.label}</h2>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 32 }}>
-      {['teamA', 'teamB'].map((teamKey, idx) => {
-      const bench = teams[teamKey].filter(p => !activePlayers[teamKey].includes(p));
-      const isRight = teamKey === 'teamB';
-      return (
-      <div
-      key={teamKey}
-      style={{
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: isRight ? 'flex-end' : 'flex-start'
-      }}
-      >
-      <h3 style={{ textAlign: isRight ? 'right' : 'left', width: '100%' }}>
-      {teamKey === 'teamA' ? matchup.home : matchup.away}
-      </h3>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRight ? 'flex-end' : 'flex-start', gap: 8 }}>
-      {activePlayers[teamKey].map(p => (
-      <div key={p['Player Name']}>
-      <button
-      onClick={() => handleSubOutClick(teamKey, p)}
-      style={{ minWidth: 160, textAlign: isRight ? 'right' : 'left' }}
-      >
-      Sub Out #{p.Number} {p['Player Name']}
-      </button>
-      </div>
-      ))}
-      </div>
-      </div>
-      );
-      })}
-      </div>
-      {/* Sub In buttons row, horizontally aligned below both teams */}
-      {subMenu.teamKey && (
-      <div
-      style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      marginTop: 16,
-      gap: 32,
-      flexWrap: 'wrap',
-      width: '100%',
-      }}
-      >
-      {['teamA', 'teamB'].map((teamKey, idx) => {
-      const bench = teams[teamKey].filter(p => !activePlayers[teamKey].includes(p));
-      const isRight = teamKey === 'teamB';
-      return (
-      <div
-      key={teamKey}
-      style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: isRight ? 'flex-end' : 'flex-start',
-        gap: 8,
-        flexWrap: 'wrap',
-        minWidth: 0,
-        maxWidth: '100%',
-      }}
-      >
-      {subMenu.teamKey === teamKey && bench.length > 0 && bench.map(player => (
-      <button
-        key={player['Player Name']}
-        className="hover:bg-gray-100"
-        style={{
-        marginBottom: 4,
-        minWidth: 140,
-        maxWidth: '100%',
-        flex: '1 1 140px',
-        textAlign: isRight ? 'right' : 'left',
-        background: '#8d8eeb',
-        wordBreak: 'break-word',
-        }}
-        onClick={() => handleSubIn(player)}
-      >
-        Sub In #{player.Number} {player['Player Name']}
-      </button>
-      ))}
-      </div>
-      );
-      })}
-      </div>
-      )}
-      </div>
-      )}
+        {selectedStat && selectedStat.label === 'Substitution' && (
+          <div>
+            <h2>Select a player for: {selectedStat.label}</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 32 }}>
+              {['teamA', 'teamB'].map((teamKey, idx) => {
+                const bench = teams[teamKey].filter(p => !activePlayers[teamKey].includes(p));
+                const isRight = teamKey === 'teamB';
+                return (
+                  <div
+                    key={teamKey}
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: isRight ? 'flex-end' : 'flex-start'
+                    }}
+                  >
+                    <h3 style={{ textAlign: isRight ? 'right' : 'left', width: '100%' }}>
+                      {teamKey === 'teamA' ? matchup.home : matchup.away}
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRight ? 'flex-end' : 'flex-start', gap: 8 }}>
+                      {activePlayers[teamKey].map(p => (
+                        <div key={p['Player Name']}>
+                          <button
+                            onClick={() => handleSubOutClick(teamKey, p)}
+                            style={{ minWidth: 160, textAlign: isRight ? 'right' : 'left' }}
+                          >
+                            Sub Out #{p.Number} {p['Player Name']}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {/* Sub In buttons row, horizontally aligned below both teams */}
+            {subMenu.teamKey && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginTop: 16,
+                  gap: 32,
+                  flexWrap: 'wrap',
+                  width: '100%',
+                }}
+              >
+                {['teamA', 'teamB'].map((teamKey, idx) => {
+                  const bench = teams[teamKey].filter(p => !activePlayers[teamKey].includes(p));
+                  const isRight = teamKey === 'teamB';
+                  return (
+                    <div
+                      key={teamKey}
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: isRight ? 'flex-end' : 'flex-start',
+                        gap: 8,
+                        flexWrap: 'wrap',
+                        minWidth: 0,
+                        maxWidth: '100%',
+                      }}
+                    >
+                      {subMenu.teamKey === teamKey && bench.length > 0 && bench.map(player => (
+                        <button
+                          key={player['Player Name']}
+                          className="hover:bg-gray-100"
+                          style={{
+                            marginBottom: 4,
+                            minWidth: 140,
+                            maxWidth: '100%',
+                            flex: '1 1 140px',
+                            textAlign: isRight ? 'right' : 'left',
+                            background: '#8d8eeb',
+                            wordBreak: 'break-word',
+                          }}
+                          onClick={() => handleSubIn(player)}
+                        >
+                          Sub In #{player.Number} {player['Player Name']}
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
-      {selectedStat && selectedStat.label !== 'Substitution' && (
-      <div>
-      <h2>Select a player for: {selectedStat.label}</h2>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 32 }}>
-        {['teamA', 'teamB'].map((teamKey, idx) => {
-      const isRight = teamKey === 'teamB';
-      return (
-        <div
-        key={teamKey}
-        style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: isRight ? 'flex-end' : 'flex-start'
-        }}
-        >
-        <h3 style={{ textAlign: isRight ? 'right' : 'left', width: '100%' }}>
-        {teamKey === 'teamA' ? matchup.home : matchup.away}
-        </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRight ? 'flex-end' : 'flex-start', gap: 8 }}>
-        {activePlayers[teamKey].map(player => (
-        <button
-          key={player['Player Name']}
-          onClick={() => handleStatClick(player['Player Name'], player.Number)}
-          style={{
-        minWidth: 160,
-        textAlign: isRight ? 'right' : 'left'
-          }}
-        >
-          #{player.Number} {player['Player Name']}
+        {selectedStat && selectedStat.label !== 'Substitution' && (
+          <div>
+            <h2>Select a player for: {selectedStat.label}</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 32 }}>
+              {['teamA', 'teamB'].map((teamKey, idx) => {
+                const isRight = teamKey === 'teamB';
+                return (
+                  <div
+                    key={teamKey}
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: isRight ? 'flex-end' : 'flex-start'
+                    }}
+                  >
+                    <h3 style={{ textAlign: isRight ? 'right' : 'left', width: '100%' }}>
+                      {teamKey === 'teamA' ? matchup.home : matchup.away}
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRight ? 'flex-end' : 'flex-start', gap: 8 }}>
+                      {activePlayers[teamKey].map(player => (
+                        <button
+                          key={player['Player Name']}
+                          onClick={() => handleStatClick(player['Player Name'], player.Number)}
+                          style={{
+                            minWidth: 160,
+                            textAlign: isRight ? 'right' : 'left'
+                          }}
+                        >
+                          #{player.Number} {player['Player Name']}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="play-by-play-box">
+          <h2>Play-by-Play</h2>
+          <div className="play-log">
+            {playByPlay.map((event, i) => (
+              <div key={i}>{event}</div>
+            ))}
+          </div>
+        </div>
+
+        <br />
+        <button onClick={undoLast}>
+          Undo Last Action
         </button>
-        ))}
+        <div>
+          <div>
+            {['teamA', 'teamB'].map(teamKey => {
+              const total = calculateTeamTotals(teamKey);
+              const bench = teams[teamKey].filter(p => !activePlayers[teamKey].includes(p));
+
+              return (
+                <div key={teamKey}>
+                  <h2>{teamKey === 'teamA' ? matchup.home : matchup.away}</h2>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>PLAYER</th>
+                        <th>PTS</th>
+                        <th>FG</th>
+                        <th>3PT</th>
+                        <th>FT</th>
+                        <th>OREB</th>
+                        <th>DREB</th>
+                        <th>AST</th>
+                        <th>STL</th>
+                        <th>BLK</th>
+                        <th>FOUL</th>
+                        <th>TO</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...teams[teamKey]].map((p) => (
+                        <tr key={p['Player Name']} className="text-center">
+                          <td>{p.Number}</td>
+                          <td>{p['Player Name']}</td>
+                          <td>{stats[p['Player Name']].points}</td>
+                          <td>{stats[p['Player Name']].fgMade}/{stats[p['Player Name']].fgAttempted}</td>
+                          <td>{stats[p['Player Name']].threeMade}/{stats[p['Player Name']].threeAttempted}</td>
+                          <td>{stats[p['Player Name']].ftMade}/{stats[p['Player Name']].ftAttempted}</td>
+                          <td>{stats[p['Player Name']].offRebounds}</td>
+                          <td>{stats[p['Player Name']].defRebounds}</td>
+                          <td>{stats[p['Player Name']].assists}</td>
+                          <td>{stats[p['Player Name']].steals}</td>
+                          <td>{stats[p['Player Name']].blocks}</td>
+                          <td>{stats[p['Player Name']].fouls}</td>
+                          <td>{stats[p['Player Name']].turnovers}</td>
+                        </tr>
+                      ))}
+                      <tr className="text-center">
+                        <td colSpan="2">Total</td>
+                        <td>{total.points}</td>
+                        <td>{total.fgMade}/{total.fgAttempted}</td>
+                        <td>{total.threeMade}/{total.threeAttempted}</td>
+                        <td>{total.ftMade}/{total.ftAttempted}</td>
+                        <td>{total.offRebounds}</td>
+                        <td>{total.defRebounds}</td>
+                        <td>{total.assists}</td>
+                        <td>{total.steals}</td>
+                        <td>{total.blocks}</td>
+                        <td>{total.fouls}</td>
+                        <td>{total.turnovers}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })}
+          </div>
+          <br />
+          <button
+            className="export-button"
+            onClick={async () => {
+              try {
+                const gameId = `${matchup.home} ${matchup.away} ${matchup.date}_court${matchup.court}`;
+
+                const formattedStats = formatStatsForExport(stats, rosters, gameId);
+
+                console.log('Formatted payload example:', formattedStats[0]);
+
+                const response = await fetch('/api/exportBoxScore', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ rows: formattedStats, eventKey: selectedEvent?.value }),
+                });
+
+                const result = await response.json();
+                alert(result.message);
+              } catch (err) {
+                console.error('Export failed', err);
+                alert('Failed to export box score');
+              }
+            }}
+          >
+            Export Box Score
+          </button>
+          <button onClick={downloadBoxScoreToCSV}>
+            Download Box Score
+          </button>
         </div>
-        </div>
-      );
-        })}
-      </div>
-      </div>
-      )}
-
-      <div className="play-by-play-box">
-      <h2>Play-by-Play</h2>
-      <div className="play-log">
-      {playByPlay.map((event, i) => (
-      <div key={i}>{event}</div>
-      ))}
-      </div>
-      </div>
-
-      <br />
-      <button onClick={undoLast}>
-      Undo Last Action
-      </button>
-      <div>
-      <div>
-      {['teamA', 'teamB'].map(teamKey => {
-      const total = calculateTeamTotals(teamKey);
-      const bench = teams[teamKey].filter(p => !activePlayers[teamKey].includes(p));
-
-      return (
-      <div key={teamKey}>
-      <h2>{teamKey === 'teamA' ? matchup.home : matchup.away}</h2>
-      <table>
-      <thead>
-      <tr>
-      <th>#</th>
-      <th>PLAYER</th>
-      <th>PTS</th>
-      <th>FG</th>
-      <th>3PT</th>
-      <th>FT</th>
-      <th>OREB</th>
-      <th>DREB</th>
-      <th>AST</th>
-      <th>STL</th>
-      <th>BLK</th>
-      <th>FOUL</th>
-      <th>TO</th>
-      </tr>
-      </thead>
-      <tbody>
-      {[...teams[teamKey]].map((p) => (
-      <tr key={p['Player Name']} className="text-center">
-      <td>{p.Number}</td>
-      <td>{p['Player Name']}</td>
-      <td>{stats[p['Player Name']].points}</td>
-      <td>{stats[p['Player Name']].fgMade}/{stats[p['Player Name']].fgAttempted}</td>
-      <td>{stats[p['Player Name']].threeMade}/{stats[p['Player Name']].threeAttempted}</td>
-      <td>{stats[p['Player Name']].ftMade}/{stats[p['Player Name']].ftAttempted}</td>
-      <td>{stats[p['Player Name']].offRebounds}</td>
-      <td>{stats[p['Player Name']].defRebounds}</td>
-      <td>{stats[p['Player Name']].assists}</td>
-      <td>{stats[p['Player Name']].steals}</td>
-      <td>{stats[p['Player Name']].blocks}</td>
-      <td>{stats[p['Player Name']].fouls}</td>
-      <td>{stats[p['Player Name']].turnovers}</td>
-      </tr>
-      ))}
-      <tr className="text-center">
-      <td colSpan="2">Total</td>
-      <td>{total.points}</td>
-      <td>{total.fgMade}/{total.fgAttempted}</td>
-      <td>{total.threeMade}/{total.threeAttempted}</td>
-      <td>{total.ftMade}/{total.ftAttempted}</td>
-      <td>{total.offRebounds}</td>
-      <td>{total.defRebounds}</td>
-      <td>{total.assists}</td>
-      <td>{total.steals}</td>
-      <td>{total.blocks}</td>
-      <td>{total.fouls}</td>
-      <td>{total.turnovers}</td>
-      </tr>
-      </tbody>
-      </table>
-      </div>
-      );
-      })}
-      </div>
-      <br />
-      <button
-  className="export-button"
-  onClick={async () => {
-    try {
-      const gameId = `${matchup.home} ${matchup.away} ${matchup.date}_court${matchup.court}`;
-
-      const formattedStats = formatStatsForExport(stats, rosters, gameId);
-
-      console.log('Formatted payload example:', formattedStats[0]);
-
-      const response = await fetch('/api/exportBoxScore', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ rows: formattedStats, eventKey: selectedEvent?.value }),
-      });
-
-      const result = await response.json();
-      alert(result.message);
-    } catch (err) {
-      console.error('Export failed', err);
-      alert('Failed to export box score');
-    }
-  }}
->
-  Export Box Score
-</button>
-<button onClick={downloadBoxScoreToCSV}>
-      Download Box Score
-      </button>
-      </div>
       </div>
     );
 }

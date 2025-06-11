@@ -52,7 +52,7 @@ export default function StatTrackerApp() {
         const baseName = row.Team?.trim();
         const gender = row.Gender?.trim();
         if (!baseName || !gender) return;
-        const teamName = `${baseName} - ${gender}`;
+        const teamName = `${baseName} | ${gender}`;
         if (!teamList.includes(teamName)) teamList.push(teamName);
       });
 
@@ -69,7 +69,7 @@ export default function StatTrackerApp() {
           Number: row.Number || '',
         };
         if (!baseName || !gender || !player['Player Name']) return;
-        const teamName = `${baseName} - ${gender}`;
+        const teamName = `${baseName} | ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
         teamMap[teamName].push(player);
         if (!teamList.includes(teamName)) teamList.push(teamName);
@@ -301,12 +301,12 @@ export default function StatTrackerApp() {
       }
       return prev;
     });
-    // Drop ' - Boys' or ' - Girls' from team name for backend
+    // Drop ' | Boys' or ' | Girls' from team name for backend
     const fullTeamName = teamKey === 'teamA' ? matchup.home : matchup.away;
     let baseName = fullTeamName;
     let gender = '';
-    if (fullTeamName.includes(' - ')) {
-      [baseName, gender] = fullTeamName.split(' - ');
+    if (fullTeamName.includes(' | ')) {
+      [baseName, gender] = fullTeamName.split(' | ');
     }
     await fetch('/api/addPlayerToRoster', {
       method: 'POST',
@@ -329,7 +329,7 @@ export default function StatTrackerApp() {
         Number: row.number || '',
       };
       if (!baseName || !gender || !playerObj['Player Name']) return;
-      const teamName = `${baseName} - ${gender}`;
+      const teamName = `${baseName} | ${gender}`;
       if (!teamMap[teamName]) teamMap[teamName] = [];
       teamMap[teamName].push(playerObj);
     });
@@ -954,7 +954,7 @@ function formatStatsForExport(stats, rosters, gameId) {
   className="export-button"
   onClick={async () => {
     try {
-      const gameId = `${matchup.home}_${matchup.away}_${matchup.date}_court${matchup.court}`;
+      const gameId = `${matchup.home} ${matchup.away} ${matchup.date}_court${matchup.court}`;
 
       const formattedStats = formatStatsForExport(stats, rosters, gameId);
 

@@ -258,6 +258,9 @@ export default function StatTrackerApp() {
   if (stage === 'starters') {
     return (
       <div>
+        <header className="main-header">
+          <h1>🏀 Basketball Stat Tracker</h1>
+        </header>
       <h1>Select Starters</h1>
       <p>You must select 5 players for each team to start tracking stats.</p>
 
@@ -473,55 +476,55 @@ export default function StatTrackerApp() {
   };
 
   const undoLast = () => {
-  if (history.length === 0) return;
-  const last = history[history.length - 1];
+    if (history.length === 0) return;
+    const last = history[history.length - 1];
 
-  setHistory(prev => prev.slice(0, -1));
-  setPlayByPlay(prev => prev.slice(1));
-
-  if (last.type === 'substitution') {
-    onSubstitute(last.teamKey, last.inPlayer, last.outPlayer);
     setHistory(prev => prev.slice(0, -1));
     setPlayByPlay(prev => prev.slice(1));
-    return;
-  }
 
-  // Handle stat undo
-  setStats(prev => {
-    const playerStats = { ...prev[last.playerName] };
-
-    if (last.label === 'Make 2PT') {
-      playerStats.points = Math.max(playerStats.points - 2, 0);
-      playerStats.fgMade = Math.max(playerStats.fgMade - 1, 0);
-      playerStats.fgAttempted = Math.max(playerStats.fgAttempted - 1, 0);
-    } else if (last.label === 'Make 3PT') {
-      playerStats.points = Math.max(playerStats.points - 3, 0);
-      playerStats.fgMade = Math.max(playerStats.fgMade - 1, 0);
-      playerStats.fgAttempted = Math.max(playerStats.fgAttempted - 1, 0);
-      playerStats.threeMade = Math.max(playerStats.threeMade - 1, 0);
-      playerStats.threeAttempted = Math.max(playerStats.threeAttempted - 1, 0);
-    } else if (last.label === 'Make FT') {
-      playerStats.points = Math.max(playerStats.points - 1, 0);
-      playerStats.ftMade = Math.max(playerStats.ftMade - 1, 0);
-      playerStats.ftAttempted = Math.max(playerStats.ftAttempted - 1, 0);
-    } else if (last.label === 'Miss 2PT') {
-      playerStats.fgAttempted = Math.max(playerStats.fgAttempted - 1, 0);
-    } else if (last.label === 'Miss 3PT') {
-      playerStats.fgAttempted = Math.max(playerStats.fgAttempted - 1, 0);
-      playerStats.threeAttempted = Math.max(playerStats.threeAttempted - 1, 0);
-    } else if (last.label === 'Miss FT') {
-      playerStats.ftAttempted = Math.max(playerStats.ftAttempted - 1, 0);
-    } else {
-      const key = last.stat;
-      playerStats[key] = Math.max((playerStats[key] || 0) - last.value, 0);
+    if (last.type === 'substitution') {
+      onSubstitute(last.teamKey, last.inPlayer, last.outPlayer);
+      setHistory(prev => prev.slice(0, -1));
+      setPlayByPlay(prev => prev.slice(1));
+      return;
     }
 
-    return {
-      ...prev,
-      [last.playerName]: playerStats,
-    };
-  });
-};
+    // Handle stat undo
+    setStats(prev => {
+      const playerStats = { ...prev[last.playerName] };
+
+      if (last.label === 'Make 2PT') {
+        playerStats.points = Math.max(playerStats.points - 2, 0);
+        playerStats.fgMade = Math.max(playerStats.fgMade - 1, 0);
+        playerStats.fgAttempted = Math.max(playerStats.fgAttempted - 1, 0);
+      } else if (last.label === 'Make 3PT') {
+        playerStats.points = Math.max(playerStats.points - 3, 0);
+        playerStats.fgMade = Math.max(playerStats.fgMade - 1, 0);
+        playerStats.fgAttempted = Math.max(playerStats.fgAttempted - 1, 0);
+        playerStats.threeMade = Math.max(playerStats.threeMade - 1, 0);
+        playerStats.threeAttempted = Math.max(playerStats.threeAttempted - 1, 0);
+      } else if (last.label === 'Make FT') {
+        playerStats.points = Math.max(playerStats.points - 1, 0);
+        playerStats.ftMade = Math.max(playerStats.ftMade - 1, 0);
+        playerStats.ftAttempted = Math.max(playerStats.ftAttempted - 1, 0);
+      } else if (last.label === 'Miss 2PT') {
+        playerStats.fgAttempted = Math.max(playerStats.fgAttempted - 1, 0);
+      } else if (last.label === 'Miss 3PT') {
+        playerStats.fgAttempted = Math.max(playerStats.fgAttempted - 1, 0);
+        playerStats.threeAttempted = Math.max(playerStats.threeAttempted - 1, 0);
+      } else if (last.label === 'Miss FT') {
+        playerStats.ftAttempted = Math.max(playerStats.ftAttempted - 1, 0);
+      } else {
+        const key = last.stat;
+        playerStats[key] = Math.max((playerStats[key] || 0) - last.value, 0);
+      }
+
+      return {
+        ...prev,
+        [last.playerName]: playerStats,
+      };
+    });
+  };
 
    const calculateTeamTotals = (teamKey) => {
     const totals = {
@@ -700,8 +703,8 @@ function formatStatsForExport(stats, rosters, gameId) {
     return (
       <div>
         <header className="main-header">
-  <h1>🏀 Basketball Stat Tracker</h1>
-</header>
+          <h2>🏀 Basketball Stat Tracker</h2>
+        </header>
         <div>
           <h3>Quarter: {quarter}</h3>
           <button onClick={() => setQuarter(q => Math.max(1, q - 1))}>-</button>

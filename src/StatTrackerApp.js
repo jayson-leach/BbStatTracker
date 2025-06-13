@@ -360,6 +360,19 @@ export default function StatTrackerApp() {
         }
       }}
       />
+      <button
+        style={{ marginLeft: 8 }}
+        onClick={() => {
+          setEditPlayerTeam(teamKey);
+          setEditPlayerName('');
+          setEditPlayerNewName('');
+          setEditPlayerNewNumber('');
+          setShowEditPlayer(true);
+        }}
+        title="Edit player"
+      >
+        Edit Player
+      </button>
       </div>
       <h3>Selected: {starterSelection[teamKey].length}/5</h3>
       <br />
@@ -371,19 +384,6 @@ export default function StatTrackerApp() {
       onClick={() => toggleStarter(teamKey, player)}
     >
       #{player.Number} {player['Player Name']}
-    </button>
-    <button
-      style={{ marginLeft: 8 }}
-      onClick={() => {
-        setEditPlayerTeam(teamKey);
-        setEditPlayerName('');
-        setEditPlayerNewName('');
-        setEditPlayerNewNumber('');
-        setShowEditPlayer(true);
-      }}
-      title="Edit player"
-    >
-      Edit Player
     </button>
   </div>
 ))}

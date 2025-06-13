@@ -22,7 +22,9 @@ export default function StatTrackerApp() {
   const [starterSelection, setStarterSelection] = useState({ teamA: [], teamB: [] });
   const [subMenu, setSubMenu] = useState({ teamKey: null, outPlayer: null });
   // State for bench add number input
-  const [benchAddNumber, setBenchAddNumber] = useState({ teamA: '', teamB: '' });
+  const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [addPlayerTeam, setAddPlayerTeam] = useState('');
+  const [addPlayerNumber, setAddPlayerNumber] = useState('');
 
   // Reset starter selection when stage changes to 'matchup'
   useEffect(() => {
@@ -920,6 +922,9 @@ function formatStatsForExport(stats, rosters, gameId) {
             <button onClick={undoLast}>
               Undo Last Action
             </button>
+            <button onClick={() => setShowAddPlayer(true)} style={{ marginLeft: 8 }}>
+              Add New Player
+            </button>
             <div>
               <div>
               {['teamA', 'teamB'].map(teamKey => {
@@ -1018,6 +1023,88 @@ function formatStatsForExport(stats, rosters, gameId) {
             Download Box Score
           </button>
         </div>
+
+        {showAddPlayer && (
+  <div style={{
+    background: 'rgba(0,0,0,0.3)',
+    position: 'fixed',
+    top: 0, left: 0, right: 0, bottom: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    zIndex: 1000
+  }}>
+    <div style={{
+      background: '#fff',
+      padding: 24,
+      borderRadius: 8,
+      minWidth: 300,
+      boxShadow: '0 2px 12px rgba(0,0,0,0.15)'
+    }}>
+      <h3>Add New Player</h3>
+      <div>
+        <label>
+          Team:
+          <select
+            value={addPlayerTeam}
+            onChange={e => setAddPlayerTeam(e.target.value)}
+            style={{ marginLeft: 8, marginBottom: 8 }}
+          >
+            <option value="">Select Team</option>
+            <option value="teamA">{matchup.home}</option>
+            <option value="teamB">{matchup.away}</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>
+          Number:
+          <input
+            type="text"
+            value={addPlayerNumber}
+            onChange={e => setAddPlayerNumber(e.target.value)}
+            style={{ marginLeft: 8, width: 60 }}
+          />
+        </label>
+      </div>
+      <div style={{ marginTop: 16 }}>
+        <button
+          onClick={() => {
+            if (!addPlayerTeam || !addPlayerNumber.trim()) return;
+            // Find next unique Unknown N
+            const roster = teams[addPlayerTeam];
+            let n = 1;
+            let name;
+            do {
+              name = `Unknown ${n}`;
+              n++;
+            } while (roster.some(p => p['Player Name'] === name));
+            const newPlayer = { 'Player Name': name, Number: addPlayerNumber.trim() };
+            // Add to teams and rosters, but not activePlayers
+            setTeams(prev => ({
+              ...prev,
+              [addPlayerTeam]: [...prev[addPlayerTeam], newPlayer]
+            }));
+            setRosters(prev => ({
+              ...prev,
+              [addPlayerTeam === 'teamA' ? matchup.home : matchup.away]: [
+                ...(prev[addPlayerTeam === 'teamA' ? matchup.home : matchup.away] || []),
+                newPlayer
+              ]
+            }));
+            setShowAddPlayer(false);
+            setAddPlayerTeam('');
+            setAddPlayerNumber('');
+          }}
+          style={{ marginRight: 8 }}
+        >
+          Add
+        </button>
+        <button onClick={() => { setShowAddPlayer(false); setAddPlayerTeam(''); setAddPlayerNumber(''); }}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
     );
 }

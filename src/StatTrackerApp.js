@@ -53,8 +53,8 @@ export default function StatTrackerApp() {
       // Format: [{ Team, Gender, 'Player Name', Number }, ...]
       const teamMap = {};
       rosterData.forEach(row => {
-        const baseName = row.team?.trim();
-        const gender = row.gender?.trim();
+        const baseName = row.Team?.trim();
+        const gender = row.Gender?.trim();
         const player = {
           'Player Name': row['Player Name']?.trim(),
           Number: row.Number || '',

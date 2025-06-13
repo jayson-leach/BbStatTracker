@@ -672,7 +672,7 @@ function formatStatsForExport(stats, rosters, gameId) {
           <h1>🏀 Hoop Tracker</h1>
         </div>
         <div>
-          <h3>Period: {period}</h3>
+          <h3>Game Period: {period}</h3>
           <button onClick={() => setPeriod(q => Math.max(1, q - 1))}>-</button>
           <button onClick={() => setPeriod(q => Math.min(4, q + 1))}>+</button>
         </div>

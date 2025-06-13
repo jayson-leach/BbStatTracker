@@ -350,8 +350,6 @@ export default function StatTrackerApp() {
         }
       }}
       />
-      {/* Show helper text when Add Player is open */}
-      <AddPlayerHelper teamKey={teamKey} />
       </div>
       <h3>Selected: {starterSelection[teamKey].length}/5</h3>
       <br />
@@ -379,81 +377,6 @@ export default function StatTrackerApp() {
       </div>
       </div>
     );
-
-    // Helper component to show text under Add Player when open
-    function AddPlayerHelper({ teamKey }) {
-      const [show, setShow] = useState(false);
-      // Listen for AddPlayerButton open/close
-      useEffect(() => {
-      const handler = (e) => {
-        if (e.detail && e.detail.teamKey === teamKey) {
-        setShow(e.detail.show);
-        }
-      };
-      window.addEventListener('add-player-toggle', handler);
-      return () => window.removeEventListener('add-player-toggle', handler);
-      }, [teamKey]);
-      if (!show) return null;
-      return (
-      <div style={{ marginTop: 8, color: '#6366f1', fontWeight: 500 }}>
-        Enter the player's name and number. Ensure player names are unique.
-      </div>
-      );
-    }
-
-    // Patch AddPlayerButton to dispatch event on open/close
-    function AddPlayerButton({ teamKey, teamName, onAdd }) {
-      const [show, setShow] = useState(false);
-      const [name, setName] = useState('');
-      const [number, setNumber] = useState('');
-      useEffect(() => {
-      window.dispatchEvent(new CustomEvent('add-player-toggle', { detail: { teamKey, show } }));
-      }, [show, teamKey]);
-      return (
-      <>
-      <button onClick={() => setShow(s => !s)}>
-      Add Player
-      </button>
-      {show && (
-      <div style={{ display: 'inline-block', marginLeft: 8 }}>
-        <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={e => setName(e.target.value)}
-        style={{ marginRight: 4 }}
-        />
-        <input
-        type="text"
-        placeholder="Number"
-        value={number}
-        onChange={e => setNumber(e.target.value)}
-        style={{ marginRight: 4, width: 50 }}
-        />
-        <button
-        onClick={() => {
-        if (!name.trim()) return;
-        onAdd({
-        'Player Name': name.trim(),
-        Number: number.trim()
-        });
-        setName('');
-        setNumber('');
-        setShow(false);
-        }}
-        >
-        Save
-        </button>
-        <button onClick={() => setShow(false)} style={{ marginLeft: 4 }}>
-        Cancel
-        </button>
-      </div>
-      )}
-      </>
-      );
-    }
-
-    // (Removed duplicate AddPlayerButton definition)
   }
 
   const actionButtons = [
@@ -1127,4 +1050,76 @@ function formatStatsForExport(stats, rosters, gameId) {
 )}
       </div>
     );
+}
+
+function AddPlayerButton({ teamKey, teamName, onAdd }) {
+  const [show, setShow] = useState(false);
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+
+  return (
+    <>
+      <button onClick={() => setShow(true)}>
+        Add Player
+      </button>
+      {show && (
+        <div style={{
+          background: 'rgba(0,0,0,0.3)',
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#fff',
+            padding: 24,
+            borderRadius: 8,
+            minWidth: 300,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.15)'
+          }}>
+            <h3>Add Player to {teamName}</h3>
+            <div style={{ marginTop: 8, color: '#6366f1', fontWeight: 500 }}>
+              Enter the player's name and number. Ensure player names are unique.
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                style={{ marginRight: 8, width: 140 }}
+              />
+              <input
+                type="text"
+                placeholder="Number"
+                value={number}
+                onChange={e => setNumber(e.target.value)}
+                style={{ width: 60 }}
+              />
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <button
+                onClick={() => {
+                  if (!name.trim()) return;
+                  onAdd({
+                    'Player Name': name.trim(),
+                    Number: number.trim()
+                  });
+                  setName('');
+                  setNumber('');
+                  setShow(false);
+                }}
+                style={{ marginRight: 8 }}
+              >
+                Save
+              </button>
+              <button onClick={() => setShow(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

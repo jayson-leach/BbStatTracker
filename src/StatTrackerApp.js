@@ -522,7 +522,9 @@ export default function StatTrackerApp() {
             minWidth: 320,
             boxShadow: '0 2px 12px rgba(0,0,0,0.15)'
           }}>
-            <h3>Edit Player on {teamName}</h3>
+            <h3>
+              Edit Player on {editPlayerTeam === 'teamA' ? matchup.home : editPlayerTeam === 'teamB' ? matchup.away : ''}
+            </h3>
             <div style={{ marginBottom: 12 }}>
               <label>
                 Player:

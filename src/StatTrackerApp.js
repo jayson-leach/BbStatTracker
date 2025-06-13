@@ -21,6 +21,8 @@ export default function StatTrackerApp() {
   const [subOutPlayer, setSubOutPlayer] = useState(null);
   const [starterSelection, setStarterSelection] = useState({ teamA: [], teamB: [] });
   const [subMenu, setSubMenu] = useState({ teamKey: null, outPlayer: null });
+  // State for bench add number input
+  const [benchAddNumber, setBenchAddNumber] = useState({ teamA: '', teamB: '' });
 
   // Reset starter selection when stage changes to 'matchup'
   useEffect(() => {

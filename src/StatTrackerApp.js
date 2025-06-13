@@ -29,6 +29,12 @@ export default function StatTrackerApp() {
   const [showRemovePlayer, setShowRemovePlayer] = useState(false);
   const [removePlayerTeam, setRemovePlayerTeam] = useState('');
   const [removePlayerName, setRemovePlayerName] = useState('');
+  // New states for editng players
+  const [showEditPlayer, setShowEditPlayer] = useState(false);
+  const [editPlayerTeam, setEditPlayerTeam] = useState('');
+  const [editPlayerName, setEditPlayerName] = useState('');
+  const [editPlayerNewName, setEditPlayerNewName] = useState('');
+  const [editPlayerNewNumber, setEditPlayerNewNumber] = useState('');
 
   // Reset starter selection when stage changes to 'matchup'
   useEffect(() => {
@@ -359,14 +365,28 @@ export default function StatTrackerApp() {
       <br />
       <div>
       {teams[teamKey].map(player => (
-      <button
-      key={player['Player Name']}
+  <div key={player['Player Name']} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <button
       className={`toggle-starter-button ${starterSelection[teamKey].includes(player) ? 'active' : ''}`}
       onClick={() => toggleStarter(teamKey, player)}
-      >
+    >
       #{player.Number} {player['Player Name']}
-      </button>
-      ))}
+    </button>
+    <button
+      style={{ marginLeft: 8 }}
+      onClick={() => {
+        setEditPlayerTeam(teamKey);
+        setEditPlayerName(player['Player Name']);
+        setEditPlayerNewName(player['Player Name']);
+        setEditPlayerNewNumber(player.Number);
+        setShowEditPlayer(true);
+      }}
+      title="Edit player"
+    >
+      Edit
+    </button>
+  </div>
+))}
       </div>
       </div>
       ))}

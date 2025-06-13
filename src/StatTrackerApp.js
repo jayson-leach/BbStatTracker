@@ -157,8 +157,8 @@ export default function StatTrackerApp() {
       onChange={(option) => setSelectedEvent(option)}
       placeholder="Choose an event"
     />
-    </div>
-        <br />
+      </div>
+    <br />
 
         <p>Home Team</p>
         <Select
@@ -376,14 +376,14 @@ export default function StatTrackerApp() {
       style={{ marginLeft: 8 }}
       onClick={() => {
         setEditPlayerTeam(teamKey);
-        setEditPlayerName(player['Player Name']);
-        setEditPlayerNewName(player['Player Name']);
-        setEditPlayerNewNumber(player.Number);
+        setEditPlayerName('');
+        setEditPlayerNewName('');
+        setEditPlayerNewNumber('');
         setShowEditPlayer(true);
       }}
       title="Edit player"
     >
-      Edit
+      Edit Player
     </button>
   </div>
 ))}
@@ -392,8 +392,8 @@ export default function StatTrackerApp() {
       ))}
 
       {/* Remove Player button and modal */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16, background: '#f25c5c'}}>
-        <button onClick={() => setShowRemovePlayer(true)}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16}}>
+        <button onClick={() => setShowRemovePlayer(true)} style={{background: '#f25c5c'}}>
           Remove Player
         </button>
       </div>
@@ -498,6 +498,133 @@ export default function StatTrackerApp() {
                   setShowRemovePlayer(false);
                   setRemovePlayerTeam('');
                   setRemovePlayerName('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditPlayer && (
+        <div style={{
+          background: 'rgba(0,0,0,0.3)',
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#fff',
+            padding: 24,
+            borderRadius: 8,
+            minWidth: 320,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.15)'
+          }}>
+            <h3>Edit Player</h3>
+            <div style={{ marginBottom: 12 }}>
+              <label>
+                Player:
+                <select
+                  value={editPlayerName}
+                  onChange={e => {
+                    const name = e.target.value;
+                    setEditPlayerName(name);
+                    const player = teams[editPlayerTeam].find(p => p['Player Name'] === name);
+                    setEditPlayerNewName(player ? player['Player Name'] : '');
+                    setEditPlayerNewNumber(player ? player.Number : '');
+                  }}
+                  style={{ marginLeft: 8, minWidth: 140 }}
+                >
+                  <option value="">Select Player</option>
+                  {teams[editPlayerTeam].map(p => (
+                    <option key={p['Player Name']} value={p['Player Name']}>
+                      #{p.Number} {p['Player Name']}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>
+                Name:
+                <input
+                  type="text"
+                  value={editPlayerNewName}
+                  onChange={e => setEditPlayerNewName(e.target.value)}
+                  style={{ marginLeft: 8, width: 140 }}
+                  disabled={!editPlayerName}
+                />
+              </label>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>
+                Number:
+                <input
+                  type="text"
+                  value={editPlayerNewNumber}
+                  onChange={e => setEditPlayerNewNumber(e.target.value)}
+                  style={{ marginLeft: 8, width: 60 }}
+                  disabled={!editPlayerName}
+                />
+              </label>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <button
+                style={{ marginRight: 8 }}
+                disabled={
+                  !editPlayerName ||
+                  !editPlayerNewName.trim() ||
+                  !editPlayerNewNumber.trim()
+                }
+                onClick={() => {
+                  // Update in teams
+                  setTeams(prev => ({
+                    ...prev,
+                    [editPlayerTeam]: prev[editPlayerTeam].map(p =>
+                      p['Player Name'] === editPlayerName
+                        ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
+                        : p
+                    )
+                  }));
+                  // Update in rosters
+                  setRosters(prev => {
+                    const teamLabel = editPlayerTeam === 'teamA' ? matchup.home : matchup.away;
+                    return {
+                      ...prev,
+                      [teamLabel]: (prev[teamLabel] || []).map(p =>
+                        p['Player Name'] === editPlayerName
+                          ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
+                          : p
+                      )
+                    };
+                  });
+                  // Update in starterSelection
+                  setStarterSelection(prev => ({
+                    ...prev,
+                    [editPlayerTeam]: prev[editPlayerTeam].map(p =>
+                      p['Player Name'] === editPlayerName
+                        ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
+                        : p
+                    )
+                  }));
+                  setShowEditPlayer(false);
+                  setEditPlayerTeam('');
+                  setEditPlayerName('');
+                  setEditPlayerNewName('');
+                  setEditPlayerNewNumber('');
+                }}
+              >
+                Save
+              </button>
+              <button
+                onClick={() => {
+                  setShowEditPlayer(false);
+                  setEditPlayerTeam('');
+                  setEditPlayerName('');
+                  setEditPlayerNewName('');
+                  setEditPlayerNewNumber('');
                 }}
               >
                 Cancel
@@ -973,6 +1100,7 @@ function formatStatsForExport(stats, rosters, gameId) {
               </div>
             </div>
           )}
+
             {/* Play-by-Play and Undo */}
             <div className="play-by-play-box">
               <h2>Play-by-Play</h2>

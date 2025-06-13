@@ -11,8 +11,8 @@ export default async function handler(req, res) {
   const externalJson = await externalRes.json();
   const athletes = externalJson.data || [];
 
-  // 2. Map external data to your expected roster format
-  const roster = athletes
+  // 2. Replace all entries in Supabase roster table
+  const newRoster = athletes
     .filter(a => a.name && a.jerseyNumber && a.currentTeam && a.gender)
     .map(a => ({
       Team: a.currentTeam,
@@ -21,6 +21,16 @@ export default async function handler(req, res) {
       Number: a.jerseyNumber
     }));
 
-  // 3. Return the roster data
-  res.status(200).json(roster);
+  // Delete all existing rows
+  await supabase.from('roster').delete().neq('Team', '');
+
+  // Insert new roster
+  if (newRoster.length > 0) {
+    await supabase.from('roster').insert(newRoster);
+  }
+
+  // 3. Fetch and return the updated roster as before
+  const { data, error } = await supabase.from('roster').select('*');
+  if (error) return res.status(500).json([]);
+  res.status(200).json(data);
 }

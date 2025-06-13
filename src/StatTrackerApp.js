@@ -802,7 +802,7 @@ export default function StatTrackerApp() {
   for (const [name, s] of Object.entries(stats)) {
     const team = playerTeamMap[name] || 'Unknown';
     rows.push([
-      team, name, playerNumberMap[name] ?? null, // Use null if number is not found
+      team.split(' | ')[0], name, playerNumberMap[name] ?? null, // Use null if number is not found
       s.points,
       s.fgMade, s.fgAttempted,
       s.threeMade, s.threeAttempted,
@@ -827,21 +827,7 @@ export default function StatTrackerApp() {
     for (let key in teamSums[team]) {
       teamSums[team][key] += s[key] || 0;
     }
-  }
-
-  Object.entries(teamSums).forEach(([team, totals]) => {
-    rows.push([
-      team,
-      'TOTAL', null, // No player name or number for totals
-      totals.points,
-      totals.fgMade, totals.fgAttempted,
-      totals.threeMade, totals.threeAttempted,
-      totals.ftMade, totals.ftAttempted,
-      totals.offRebounds, totals.defRebounds,
-      totals.assists, totals.steals, totals.blocks,
-      totals.fouls, totals.turnovers,
-    ]);
-  });
+  };
 
   const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
 

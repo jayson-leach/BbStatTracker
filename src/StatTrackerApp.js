@@ -904,61 +904,8 @@ function formatStatsForExport(stats, rosters, gameId) {
                 );
                 })}
               </div>
-              {/* Add Player to Bench */}
-              <div style={{ marginTop: 24 }}>
-                <h3>Add Player to Bench</h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <select
-                  value={teamKey}
-                  onChange={() => {}} // disabled, just shows which team
-                  style={{ padding: '0.3rem 0.7rem', fontSize: '1rem' }}
-                  disabled
-                >
-                  <option value="teamA">{matchup.home}</option>
-                  <option value="teamB">{matchup.away}</option>
-                </select>
-                <input
-                  type="text"
-                  placeholder="Number"
-                  value={benchAddNumber?.[teamKey] || ''}
-                  onChange={e => setBenchAddNumber(prev => ({ ...prev, [teamKey]: e.target.value }))}
-                  style={{ width: 60, marginRight: 8 }}
-                />
-                <button
-                  onClick={() => {
-                  // Find next Unknown name for this team
-                  const teamPlayers = teams[teamKey].map(p => p['Player Name']);
-                  let idx = 1;
-                  let name = `Unknown ${idx}`;
-                  while (teamPlayers.includes(name)) {
-                    idx++;
-                    name = `Unknown ${idx}`;
-                  }
-                  const number = (benchAddNumber?.[teamKey] || '').trim();
-                  if (!number) return;
-                  const newPlayer = { 'Player Name': name, Number: number };
-                  // Add to teams and rosters
-                  setTeams(prev => ({
-                    ...prev,
-                    [teamKey]: [...prev[teamKey], newPlayer]
-                  }));
-                  setRosters(prev => ({
-                    ...prev,
-                    [teamKey === 'teamA' ? matchup.home : matchup.away]: [
-                    ...(prev[teamKey === 'teamA' ? matchup.home : matchup.away] || []),
-                    newPlayer
-                    ]
-                  }));
-                  setBenchAddNumber(prev => ({ ...prev, [teamKey]: '' }));
-                  }}
-                  style={{ padding: '0.3rem 1rem' }}
-                >
-                  Add Player
-                </button>
-                </div>
-              </div>
-              </div>
-            )}
+            </div>
+          )}
             {/* Play-by-Play and Undo */}
             <div className="play-by-play-box">
               <h2>Play-by-Play</h2>

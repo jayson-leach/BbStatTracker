@@ -11,7 +11,7 @@ export default function StatTrackerApp() {
   const [teams, setTeams] = useState({ teamA: [], teamB: [] });
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [history, setHistory] = useState([]);
-  const [quarter, setQuarter] = useState(1);
+  const [period, setPeriod] = useState(1);
   const [selectedStat, setSelectedStat] = useState(null);
   const [playByPlay, setPlayByPlay] = useState([]);
   const [activePlayers, setActivePlayers] = useState({
@@ -248,7 +248,7 @@ export default function StatTrackerApp() {
       updated[teamKey] = newLineup;
       return updated;
     });
-    setPlayByPlay(prev => [`Q${quarter}: Substitution - #${outPlayer.Number} ${outPlayer['Player Name']} OUT, #${inPlayer.Number} ${inPlayer['Player Name']} IN`, ...prev]);
+    setPlayByPlay(prev => [`P${period}: Substitution - #${outPlayer.Number} ${outPlayer['Player Name']} OUT, #${inPlayer.Number} ${inPlayer['Player Name']} IN`, ...prev]);
     setHistory(prev => [
       ...prev,
       {
@@ -400,7 +400,7 @@ export default function StatTrackerApp() {
   const handleStatClick = (playerName, playerNumber) => {
     if (!selectedStat) return;
     setHistory(prev => [...prev, { playerName, ...selectedStat }]);
-    setPlayByPlay(prev => [`Q${quarter}: ${selectedStat.label} - #${playerNumber} ${playerName}`, ...prev]);
+    setPlayByPlay(prev => [`Q${period}: ${selectedStat.label} - #${playerNumber} ${playerName}`, ...prev]);
 
     setStats(prev => {
       const updated = { ...prev };
@@ -672,9 +672,9 @@ function formatStatsForExport(stats, rosters, gameId) {
           <h1>🏀 Hoop Tracker</h1>
         </div>
         <div>
-          <h3>Quarter: {quarter}</h3>
-          <button onClick={() => setQuarter(q => Math.max(1, q - 1))}>-</button>
-          <button onClick={() => setQuarter(q => Math.min(4, q + 1))}>+</button>
+          <h3>Period: {period}</h3>
+          <button onClick={() => setPeriod(q => Math.max(1, q - 1))}>-</button>
+          <button onClick={() => setPeriod(q => Math.min(4, q + 1))}>+</button>
         </div>
         <br />
 

@@ -774,6 +774,7 @@ export default function StatTrackerApp() {
   if (!stats || Object.keys(stats).length === 0) return;
 
   const headers = [
+    'game_id',
     'team',
     'name',
     'number',
@@ -802,7 +803,9 @@ export default function StatTrackerApp() {
   for (const [name, s] of Object.entries(stats)) {
     const team = playerTeamMap[name] || 'Unknown';
     rows.push([
-      team.split(' | ')[0], name, playerNumberMap[name] ?? null, // Use null if number is not found
+      matchup.home+'_'+matchup.away+'_'+matchup.date+'_court'+matchup.court,
+      team.split(' | ')[0],
+      name, playerNumberMap[name] ?? null, // Use null if number is not found
       s.points,
       s.fgMade, s.fgAttempted,
       s.threeMade, s.threeAttempted,

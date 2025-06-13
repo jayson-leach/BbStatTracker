@@ -439,53 +439,7 @@ export default function StatTrackerApp() {
       );
     }
 
-    function AddPlayerButton({ teamKey, teamName, onAdd }) {
-      const [show, setShow] = useState(false);
-      const [name, setName] = useState('');
-      const [number, setNumber] = useState('');
-      return (
-      <>
-        <button onClick={() => setShow(s => !s)}>
-        Add Player
-        </button>
-        {show && (
-        <div style={{ display: 'inline-block', marginLeft: 8 }}>
-          <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          style={{ marginRight: 4 }}
-          />
-          <input
-          type="text"
-          placeholder="Number"
-          value={number}
-          onChange={e => setNumber(e.target.value)}
-          style={{ marginRight: 4, width: 50 }}
-          />
-          <button
-          onClick={() => {
-            if (!name.trim()) return;
-            onAdd({
-            'Player Name': name.trim(),
-            Number: number.trim()
-            });
-            setName('');
-            setNumber('');
-            setShow(false);
-          }}
-          >
-          Save
-          </button>
-          <button onClick={() => setShow(false)} style={{ marginLeft: 4 }}>
-          Cancel
-          </button>
-        </div>
-        )}
-      </>
-      );
-    }
+    // (Removed duplicate AddPlayerButton definition)
   }
 
   const actionButtons = [

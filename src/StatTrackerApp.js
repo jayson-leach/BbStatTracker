@@ -923,7 +923,7 @@ function formatStatsForExport(stats, rosters, gameId) {
               Undo Last Action
             </button>
             <button onClick={() => setShowAddPlayer(true)} style={{ marginLeft: 8 }}>
-              Add New Player
+              Add Unknown Player
             </button>
             <div>
               <div>
@@ -1039,7 +1039,7 @@ function formatStatsForExport(stats, rosters, gameId) {
       minWidth: 300,
       boxShadow: '0 2px 12px rgba(0,0,0,0.15)'
     }}>
-      <h3>Add New Player</h3>
+      <h3>Add Unknown Player</h3>
       <div>
         <label>
           Team:
@@ -1089,6 +1089,16 @@ function formatStatsForExport(stats, rosters, gameId) {
                 ...(prev[addPlayerTeam === 'teamA' ? matchup.home : matchup.away] || []),
                 newPlayer
               ]
+            }));
+            setStats(prev => ({
+              ...prev,
+              [newPlayer['Player Name']]: {
+                points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
+                blocks: 0, fouls: 0, turnovers: 0,
+                fgMade: 0, fgAttempted: 0,
+                threeMade: 0, threeAttempted: 0,
+                ftMade: 0, ftAttempted: 0,
+              }
             }));
             setShowAddPlayer(false);
             setAddPlayerTeam('');

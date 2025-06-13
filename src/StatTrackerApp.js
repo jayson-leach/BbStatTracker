@@ -384,7 +384,7 @@ export default function StatTrackerApp() {
       if (!show) return null;
       return (
       <div style={{ marginTop: 8, color: '#6366f1', fontWeight: 500 }}>
-        Enter the player's name and number. Ensure player names are unique. You will be able to add more unknown player later.
+        Enter the player's name and number. Ensure player names are unique.
       </div>
       );
     }

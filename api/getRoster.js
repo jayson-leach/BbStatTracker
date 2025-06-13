@@ -24,6 +24,8 @@ export default async function handler(req, res) {
       Number: String(a.jerseyNumber)
     }));
 
+  console.log('New roster to insert:', newRoster);
+
   // Delete all existing rows
   await supabase.from('roster').delete().neq('Team', '');
 

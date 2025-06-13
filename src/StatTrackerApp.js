@@ -710,9 +710,16 @@ export default function StatTrackerApp() {
     setPlayByPlay(prev => prev.slice(1));
 
     if (last.type === 'substitution') {
-      onSubstitute(last.teamKey, last.inPlayer, last.outPlayer);
-      setHistory(prev => prev.slice(0, -1));
-      setPlayByPlay(prev => prev.slice(1));
+      // Reverse the substitution: put OUT player back in, remove IN player
+      setActivePlayers(prev => {
+        const updated = { ...prev };
+        updated[last.teamKey] = prev[last.teamKey].map(p =>
+          p['Player Name'] === last.inPlayer['Player Name'] ? last.outPlayer : p
+        );
+        return updated;
+      });
+      setSelectedStat(null);
+      setSubOutPlayer(null);
       return;
     }
 

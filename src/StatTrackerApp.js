@@ -774,16 +774,16 @@ export default function StatTrackerApp() {
   if (!stats || Object.keys(stats).length === 0) return;
 
   const headers = [
-    'Team',
-    'Player Name',
-    'Number',
-    'Points',
-    'FG Made', 'FG Attempted',
-    '3PT Made', '3PT Attempted',
-    'FT Made', 'FT Attempted',
-    'Off Rebounds', 'Def Rebounds',
-    'Assists', 'Steals', 'Blocks',
-    'Fouls', 'Turnovers',
+    'team',
+    'name',
+    'number',
+    'points',
+    'fg_made', 'fg_att',
+    'three_made', 'three_att',
+    'ft_made', 'ft_att',
+    'off_reb', 'def_reb',
+    'assists', 'steals', 'blocks',
+    'fouls', 'turnovers',
   ];
 
   // Create a lookup from player name to team name

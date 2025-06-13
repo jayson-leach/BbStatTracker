@@ -1184,7 +1184,6 @@ function formatStatsForExport(stats, rosters, gameId) {
             })}
           </div>
           <br />
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8 }}>
           <button
             className="export-button"
             onClick={async () => {
@@ -1216,6 +1215,7 @@ function formatStatsForExport(stats, rosters, gameId) {
           <button onClick={downloadBoxScoreToCSV}>
             Download Box Score
           </button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
           <button onClick={() => setStage('starters')}>
             Back to Starters
           </button>

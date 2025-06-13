@@ -378,20 +378,20 @@ export default function StatTrackerApp() {
       <br />
       <div>
       {teams[teamKey].map(player => (
-  <div key={player['Player Name']} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-    <button
+      <button
+      key={player['Player Name']}
       className={`toggle-starter-button ${starterSelection[teamKey].includes(player) ? 'active' : ''}`}
       onClick={() => toggleStarter(teamKey, player)}
-    >
+      >
       #{player.Number} {player['Player Name']}
-    </button>
-  </div>
-))}
+      </button>
+      ))}
       </div>
       </div>
       ))}
 
       {/* Remove Player button and modal */}
+      <br />
       <div style={{ display: 'flex', gap: 12, marginBottom: 16}}>
         <button onClick={() => setShowRemovePlayer(true)} style={{background: '#f25c5c'}}>
           Remove Player

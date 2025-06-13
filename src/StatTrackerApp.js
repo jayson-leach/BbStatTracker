@@ -50,11 +50,11 @@ export default function StatTrackerApp() {
 
       const rosterRes = await fetch('/api/getRoster');
       const rosterData = await rosterRes.json();
-      // Format: [{ team: 'Lincoln', gender: 'Boys', player_name: 'John', number: '12' }, ...]
+      // Format: [{ Team, Gender, 'Player Name', Number }, ...]
       const teamMap = {};
       rosterData.forEach(row => {
-        const baseName = row.Team?.trim();
-        const gender = row.Gender?.trim();
+        const baseName = row.team?.trim();
+        const gender = row.gender?.trim();
         const player = {
           'Player Name': row['Player Name']?.trim(),
           Number: row.Number || '',
@@ -62,8 +62,12 @@ export default function StatTrackerApp() {
         if (!baseName || !gender || !player['Player Name']) return;
         const teamName = `${baseName} | ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
-        teamMap[teamName].push(player);
-        if (!teamList.includes(teamName)) teamList.push(teamName);
+        // Only add if not already present (by name and number)
+        if (!teamMap[teamName].some(
+          p => p['Player Name'] === player['Player Name'] && p.Number === player.Number
+        )) {
+          teamMap[teamName].push(player);
+        }
       });
 
       teamList.forEach(teamName => {
@@ -317,10 +321,11 @@ export default function StatTrackerApp() {
         // Re-fetch roster from Supabase and update state
         const rosterRes = await fetch('/api/getRoster');
         const rosterData = await rosterRes.json();
+        // Format: [{ Team, Gender, 'Player Name', Number }, ...]
         const teamMap = {};
         rosterData.forEach(row => {
-        const baseName = row.team?.trim();
-        const gender = row.gender?.trim();
+        const baseName = row.Team?.trim();
+        const gender = row.Gender?.trim();
         const playerObj = {
           'Player Name': row.player_name?.trim(),
           Number: row.number || '',
@@ -328,7 +333,12 @@ export default function StatTrackerApp() {
         if (!baseName || !gender || !playerObj['Player Name']) return;
         const teamName = `${baseName} | ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
-        teamMap[teamName].push(playerObj);
+        // Only add if not already present (by name and number)
+        if (!teamMap[teamName].some(
+          p => p['Player Name'] === playerObj['Player Name'] && p.Number === playerObj.Number
+        )) {
+          teamMap[teamName].push(playerObj);
+        }
         });
         setRosters(teamMap);
         // Optionally update teams if needed

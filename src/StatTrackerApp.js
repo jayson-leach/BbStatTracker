@@ -461,7 +461,7 @@ export default function StatTrackerApp() {
             </div>
             <div style={{ marginTop: 16 }}>
               <button
-                style={{ color: 'red', marginRight: 8 }}
+                style={{ background: '#f25c5c', marginRight: 8 }}
                 disabled={!removePlayerTeam || !removePlayerName}
                 onClick={() => {
                   // Remove from teams, rosters, and starterSelection if present

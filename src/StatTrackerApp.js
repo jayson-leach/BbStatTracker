@@ -522,7 +522,7 @@ export default function StatTrackerApp() {
             minWidth: 320,
             boxShadow: '0 2px 12px rgba(0,0,0,0.15)'
           }}>
-            <h3>Edit Player</h3>
+            <h3>Edit Player on {teamName}</h3>
             <div style={{ marginBottom: 12 }}>
               <label>
                 Player:
@@ -1184,6 +1184,7 @@ function formatStatsForExport(stats, rosters, gameId) {
             })}
           </div>
           <br />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8 }}>
           <button
             className="export-button"
             onClick={async () => {
@@ -1215,6 +1216,10 @@ function formatStatsForExport(stats, rosters, gameId) {
           <button onClick={downloadBoxScoreToCSV}>
             Download Box Score
           </button>
+          <button onClick={() => setStage('starters')}>
+            Back to Starters
+          </button>
+        </div>
         </div>
 
         {showAddPlayer && (

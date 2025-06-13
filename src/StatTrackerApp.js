@@ -25,6 +25,10 @@ export default function StatTrackerApp() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [addPlayerTeam, setAddPlayerTeam] = useState('');
   const [addPlayerNumber, setAddPlayerNumber] = useState('');
+  // New states for removing players
+  const [showRemovePlayer, setShowRemovePlayer] = useState(false);
+  const [removePlayerTeam, setRemovePlayerTeam] = useState('');
+  const [removePlayerName, setRemovePlayerName] = useState('');
 
   // Reset starter selection when stage changes to 'matchup'
   useEffect(() => {
@@ -375,6 +379,113 @@ export default function StatTrackerApp() {
       Back to Matchup
       </button>
       </div>
+
+      {/* Remove Player button and modal */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+        <button onClick={() => setShowRemovePlayer(true)}>
+          Remove Player
+        </button>
+      </div>
+
+      {showRemovePlayer && (
+        <div style={{
+          background: 'rgba(0,0,0,0.3)',
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#fff',
+            padding: 24,
+            borderRadius: 8,
+            minWidth: 320,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.15)'
+          }}>
+            <h3>Remove Player</h3>
+            <div style={{ marginBottom: 12 }}>
+              <label>
+                Team:
+                <select
+                  value={removePlayerTeam}
+                  onChange={e => {
+                    setRemovePlayerTeam(e.target.value);
+                    setRemovePlayerName(''); // Reset player selection when team changes
+                  }}
+                  style={{ marginLeft: 8, marginBottom: 8 }}
+                >
+                  <option value="">Select Team</option>
+                  <option value="teamA">{matchup.home}</option>
+                  <option value="teamB">{matchup.away}</option>
+                </select>
+              </label>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>
+                Player:
+                <select
+                  value={removePlayerName}
+                  onChange={e => setRemovePlayerName(e.target.value)}
+                  style={{ marginLeft: 8, minWidth: 140 }}
+                  disabled={!removePlayerTeam}
+                >
+                  <option value="">Select Player</option>
+                  {removePlayerTeam && teams[removePlayerTeam].map(p => (
+                    <option key={p['Player Name']} value={p['Player Name']}>
+                      #{p.Number} {p['Player Name']}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <button
+                style={{ color: 'red', marginRight: 8 }}
+                disabled={!removePlayerTeam || !removePlayerName}
+                onClick={() => {
+                  // Remove from teams, rosters, and starterSelection if present
+                  setTeams(prev => ({
+                    ...prev,
+                    [removePlayerTeam]: prev[removePlayerTeam].filter(
+                      p => p['Player Name'] !== removePlayerName
+                    )
+                  }));
+                  setRosters(prev => {
+                    const teamLabel = removePlayerTeam === 'teamA' ? matchup.home : matchup.away;
+                    return {
+                      ...prev,
+                      [teamLabel]: (prev[teamLabel] || []).filter(
+                        p => p['Player Name'] !== removePlayerName
+                      )
+                    };
+                  });
+                  setStarterSelection(prev => ({
+                    ...prev,
+                    [removePlayerTeam]: prev[removePlayerTeam].filter(
+                      p => p['Player Name'] !== removePlayerName
+                    )
+                  }));
+                  setShowRemovePlayer(false);
+                  setRemovePlayerTeam('');
+                  setRemovePlayerName('');
+                }}
+              >
+                Confirm Remove
+              </button>
+              <button
+                onClick={() => {
+                  setShowRemovePlayer(false);
+                  setRemovePlayerTeam('');
+                  setRemovePlayerName('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       </div>
     );
   }

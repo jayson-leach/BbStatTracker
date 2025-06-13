@@ -10,6 +10,7 @@ export default async function handler(req, res) {
   const externalRes = await fetch(CACHE_ROSTER_URL);
   const externalJson = await externalRes.json();
   const athletes = externalJson.data || [];
+  console.log(athletes);
 
   // 2. Replace all entries in Supabase roster table
   //    (delete all, then insert new)
@@ -19,12 +20,10 @@ export default async function handler(req, res) {
     .filter(a => a.name && a.jerseyNumber && a.currentTeam && a.gender)
     .map(a => ({
       Team: a.currentTeam,
-      Gender: a.gender,
+      Gender: a.gender === 'Male' ? 'Boys' : a.gender === 'Female' ? 'Girls' : a.gender,
       'Player Name': a.name,
       Number: String(a.jerseyNumber)
     }));
-
-  console.log('New roster to insert:', newRoster);
 
   // Delete all existing rows
   await supabase.from('roster').delete().neq('Team', '');

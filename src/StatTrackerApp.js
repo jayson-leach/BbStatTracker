@@ -1363,14 +1363,14 @@ function formatStatsForExport(stats, rosters, gameId) {
         <button
           onClick={() => {
             if (!addPlayerTeam || !addPlayerNumber.trim()) return;
-            // Find next unique Unknown N
-            const roster = teams[addPlayerTeam];
+            // Find next unique Unknown N ACROSS BOTH TEAMS
+            const allPlayers = [...teams.teamA, ...teams.teamB];
             let n = 1;
             let name;
             do {
               name = `Unknown ${n}`;
               n++;
-            } while (roster.some(p => p['Player Name'] === name));
+            } while (allPlayers.some(p => p['Player Name'] === name));
             const newPlayer = { 'Player Name': name, Number: addPlayerNumber.trim() };
             // Add to teams and rosters, but not activePlayers
             setTeams(prev => ({

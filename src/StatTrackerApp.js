@@ -371,6 +371,13 @@ export default function StatTrackerApp() {
       </div>
       ))}
 
+      {/* Remove Player button and modal */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16, background: '#f25c5c'}}>
+        <button onClick={() => setShowRemovePlayer(true)}>
+          Remove Player
+        </button>
+      </div>
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24 }}>
       <button onClick={confirmStarters}>
       Confirm Starters
@@ -380,12 +387,6 @@ export default function StatTrackerApp() {
       </button>
       </div>
 
-      {/* Remove Player button and modal */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-        <button onClick={() => setShowRemovePlayer(true)}>
-          Remove Player
-        </button>
-      </div>
 
       {showRemovePlayer && (
         <div style={{

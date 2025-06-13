@@ -25,6 +25,8 @@ export default function StatTrackerApp() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [addPlayerTeam, setAddPlayerTeam] = useState('');
   const [addPlayerNumber, setAddPlayerNumber] = useState('');
+  const [showAddKnownPlayer, setShowAddKnownPlayer] = useState(false);
+  const [addPlayerName, setAddPlayerName] = useState('');
   // New states for removing players
   const [showRemovePlayer, setShowRemovePlayer] = useState(false);
   const [removePlayerTeam, setRemovePlayerTeam] = useState('');
@@ -661,7 +663,7 @@ export default function StatTrackerApp() {
   const handleStatClick = (playerName, playerNumber) => {
     if (!selectedStat) return;
     setHistory(prev => [...prev, { playerName, ...selectedStat }]);
-    setPlayByPlay(prev => [`Q${period}: ${selectedStat.label} - #${playerNumber} ${playerName}`, ...prev]);
+    setPlayByPlay(prev => [`P${period}: ${selectedStat.label} - #${playerNumber} ${playerName}`, ...prev]);
 
     setStats(prev => {
       const updated = { ...prev };
@@ -1106,6 +1108,9 @@ function formatStatsForExport(stats, rosters, gameId) {
             <button onClick={undoLast}>
               Undo Last Action
             </button>
+            <button onClick={() => setShowAddKnownPlayer(true)} style={{ marginLeft: 8 }}>
+              Add Player
+            </button>
             <button onClick={() => setShowAddPlayer(true)} style={{ marginLeft: 8 }}>
               Add Unknown Player
             </button>
@@ -1212,6 +1217,106 @@ function formatStatsForExport(stats, rosters, gameId) {
           </button>
         </div>
         </div>
+
+        {showAddKnownPlayer && (
+  <div style={{
+    background: 'rgba(0,0,0,0.3)',
+    position: 'fixed',
+    top: 0, left: 0, right: 0, bottom: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    zIndex: 1000
+  }}>
+    <div style={{
+      background: '#fff',
+      padding: 24,
+      borderRadius: 8,
+      minWidth: 300,
+      boxShadow: '0 2px 12px rgba(0,0,0,0.15)'
+    }}>
+      <h3>Add Known Player</h3>
+      <div>
+        <label>
+          Team:
+          <select
+            value={addPlayerTeam}
+            onChange={e => setAddPlayerTeam(e.target.value)}
+            style={{ marginLeft: 8, marginBottom: 8 }}
+          >
+            <option value="">Select Team</option>
+            <option value="teamA">{matchup.home}</option>
+            <option value="teamB">{matchup.away}</option>
+          </select>
+        </label>
+      </div>
+      <div>
+        <label>
+          Name:
+          <input
+            type="text"
+            value={addPlayerName}
+            onChange={e => setAddPlayerName(e.target.value)}
+            style={{ marginLeft: 8, width: 140 }}
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Number:
+          <input
+            type="text"
+            value={addPlayerNumber}
+            onChange={e => setAddPlayerNumber(e.target.value)}
+            style={{ marginLeft: 8, width: 60 }}
+          />
+        </label>
+      </div>
+      <div style={{ marginTop: 16 }}>
+        <button
+          onClick={() => {
+            if (!addPlayerTeam || !addPlayerName.trim() || !addPlayerNumber.trim()) return;
+            const newPlayer = { 'Player Name': addPlayerName.trim(), Number: addPlayerNumber.trim() };
+            setTeams(prev => ({
+              ...prev,
+              [addPlayerTeam]: [...prev[addPlayerTeam], newPlayer]
+            }));
+            setRosters(prev => ({
+              ...prev,
+              [addPlayerTeam === 'teamA' ? matchup.home : matchup.away]: [
+                ...(prev[addPlayerTeam === 'teamA' ? matchup.home : matchup.away] || []),
+                newPlayer
+              ]
+            }));
+            setStats(prev => ({
+              ...prev,
+              [newPlayer['Player Name']]: {
+                points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
+                blocks: 0, fouls: 0, turnovers: 0,
+                fgMade: 0, fgAttempted: 0,
+                threeMade: 0, threeAttempted: 0,
+                ftMade: 0, ftAttempted: 0,
+              }
+            }));
+            setShowAddKnownPlayer(false);
+            setAddPlayerTeam('');
+            setAddPlayerName('');
+            setAddPlayerNumber('');
+          }}
+          style={{ marginRight: 8 }}
+        >
+          Add
+        </button>
+        <button onClick={() => {
+          setShowAddKnownPlayer(false);
+          setAddPlayerTeam('');
+          setAddPlayerName('');
+          setAddPlayerNumber('');
+        }}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
         {showAddPlayer && (
   <div style={{

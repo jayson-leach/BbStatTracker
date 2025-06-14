@@ -48,20 +48,21 @@ export default function StatTrackerApp() {
 
   // Handler to resume from autosave
   const handleResume = () => {
-    setStage('tracking'); // Set stage to tracking if resuming
     const saved = localStorage.getItem('bbstat_autosave');
     if (saved) {
       const data = JSON.parse(saved);
       setMatchup(data.matchup || { home: '', away: '' });
       setRosters(data.rosters || {});
+      setTeams(data.teams || { teamA: [], teamB: [] });
       setStats(data.stats || {});
       setHistory(data.history || []);
       setStage(data.stage || 'matchup');
-      setTeams(data.teams || { teamA: [], teamB: [] });
       setPeriod(data.period || 1);
       setPlayByPlay(data.playByPlay || []);
       setActivePlayers(data.activePlayers || { teamA: [], teamB: [] });
       setStarterSelection(data.starterSelection || { teamA: [], teamB: [] });
+      // If you want to restore selectedEvent, add:
+      if (data.selectedEvent) setSelectedEvent(data.selectedEvent);
     }
     setShowResumePrompt(false);
   };

@@ -51,19 +51,23 @@ export default function StatTrackerApp() {
   const handleResume = () => {
     const saved = localStorage.getItem('bbstat_autosave');
     if (saved) {
-      setRestoring(true); // <--- Add this
+      setRestoring(true);
       const data = JSON.parse(saved);
       setMatchup(data.matchup || { home: '', away: '' });
       setRosters(data.rosters || {});
       setTeams(data.teams || { teamA: [], teamB: [] });
       setStats(data.stats || {});
       setHistory(data.history || []);
-      setStage(data.stage || 'matchup');
       setPeriod(data.period || 1);
       setPlayByPlay(data.playByPlay || []);
       setActivePlayers(data.activePlayers || { teamA: [], teamB: [] });
       setStarterSelection(data.starterSelection || { teamA: [], teamB: [] });
       if (data.selectedEvent) setSelectedEvent(data.selectedEvent);
+      // Set stage LAST so all dependencies are restored first
+      setTimeout(() => {
+        setStage(data.stage || 'matchup');
+        setRestoring(false);
+      }, 0);
     }
     setShowResumePrompt(false);
   };

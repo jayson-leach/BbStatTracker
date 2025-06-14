@@ -56,7 +56,7 @@ export default function StatTrackerApp() {
         const baseName = row.Team?.trim();
         const gender = row.Gender?.trim();
         if (!baseName || !gender) return;
-        const teamName = `${baseName} | ${gender}`;
+        const teamName = `${baseName} -- ${gender}`;
         if (!teamList.includes(teamName)) teamList.push(teamName);
       });
 
@@ -343,7 +343,7 @@ export default function StatTrackerApp() {
           Number: row.number || '',
         };
         if (!baseName || !gender || !playerObj['Player Name']) return;
-        const teamName = `${baseName} | ${gender}`;
+        const teamName = `${baseName} -- ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
         // Only add if not already present (by name and number)
         if (!teamMap[teamName].some(

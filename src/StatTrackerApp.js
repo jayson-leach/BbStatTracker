@@ -46,26 +46,9 @@ export default function StatTrackerApp() {
     if (saved) setShowResumePrompt(true);
   }, []);
 
-  // Autosave on key state changes
-  useEffect(() => {
-    const data = {
-      matchup,
-      rosters,
-      stats,
-      history,
-      stage,
-      teams,
-      period,
-      playByPlay,
-      activePlayers,
-      starterSelection,
-    };
-    localStorage.setItem('bbstat_autosave', JSON.stringify(data));
-  }, [matchup, rosters, stats, history, stage, teams, period, playByPlay, activePlayers, starterSelection]);
-
   // Handler to resume from autosave
   const handleResume = () => {
-    stage = 'tracking'; // Set stage to tracking if resuming
+    setStage('tracking'); // Set stage to tracking if resuming
     const saved = localStorage.getItem('bbstat_autosave');
     if (saved) {
       const data = JSON.parse(saved);
@@ -187,6 +170,24 @@ export default function StatTrackerApp() {
       setStats(freshStats);
     }
   }, [stage, teams]);
+
+  // Autosave on key state changes
+  useEffect(() => {
+    const data = {
+      matchup,
+      rosters,
+      stats,
+      history,
+      stage,
+      teams,
+      period,
+      playByPlay,
+      activePlayers,
+      starterSelection,
+    };
+    localStorage.setItem('bbstat_autosave', JSON.stringify(data));
+  }, [matchup, rosters, stats, history, stage, teams, period, playByPlay, activePlayers, starterSelection]);
+
 
   // Prepare team options for the select dropdown
   const teamOptions = teamNames.sort().map((name) => ({ value: name, label: name }));

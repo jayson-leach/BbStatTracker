@@ -72,7 +72,7 @@ export default function StatTrackerApp() {
           Number: row.Number || '',
         };
         if (!baseName || !gender || !player['Player Name']) return;
-        const teamName = `${baseName} | ${gender}`;
+        const teamName = `${baseName} -- ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
         // Only add if not already present (by name and number)
         if (!teamMap[teamName].some(
@@ -318,8 +318,8 @@ export default function StatTrackerApp() {
         const fullTeamName = teamKey === 'teamA' ? matchup.home : matchup.away;
         let baseName = fullTeamName;
         let gender = '';
-        if (fullTeamName.includes(' | ')) {
-        [baseName, gender] = fullTeamName.split(' | ');
+        if (fullTeamName.includes(' -- ')) {
+        [baseName, gender] = fullTeamName.split(' -- ');
         }
         await fetch('/api/addPlayerToRoster', {
         method: 'POST',
@@ -806,7 +806,7 @@ export default function StatTrackerApp() {
     const team = playerTeamMap[name] || 'Unknown';
     rows.push([
       matchup.home+'_'+matchup.away+'_'+matchup.date+'_court'+matchup.court,
-      team.split(' | ')[0],
+      team.split(' -- ')[0],
       name, playerNumberMap[name] ?? null, // Use null if number is not found
       s.points,
       s.fgMade, s.fgAttempted,
@@ -865,7 +865,7 @@ function formatStatsForExport(stats, rosters, gameId) {
 
     allStats.push({
       game_id: gameId,
-      team: teamKey.split(' | ')[0], // Get team name without Boys / Girls
+      team: teamKey.split(' -- ')[0], // Get team name without Boys / Girls
       name: playerName,
       number: number,
       points: playerStats.points || 0,

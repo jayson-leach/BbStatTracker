@@ -74,7 +74,7 @@ export default function StatTrackerApp() {
 
   // Handler to reset and clear autosave
   const handleReset = () => {
-    console.log(localStorage.getItem('bbstat_autosave'));
+    console.log(JSON.parse(localStorage.getItem('bbstat_autosave')));
     localStorage.removeItem('bbstat_autosave');
     setShowResumePrompt(false);
     window.location.reload();

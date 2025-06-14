@@ -1001,6 +1001,8 @@ function formatStatsForExport(stats, rosters, gameId) {
       return {};
     };
 
+  // Render the main tracking interface
+  if (stage === 'tracking') {
     return (
       <div>
         <div className="main-header">
@@ -1494,6 +1496,7 @@ function formatStatsForExport(stats, rosters, gameId) {
 )}
       </div>
     );
+}
 }
 
 function AddPlayerButton({ teamKey, teamName, onAdd }) {

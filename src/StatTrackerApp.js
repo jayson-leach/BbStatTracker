@@ -39,6 +39,7 @@ export default function StatTrackerApp() {
   const [editPlayerNewNumber, setEditPlayerNewNumber] = useState('');
   // Resume prompt for autosave
   const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   // On mount, check for autosaved data
   useEffect(() => {
@@ -50,6 +51,7 @@ export default function StatTrackerApp() {
   const handleResume = () => {
     const saved = localStorage.getItem('bbstat_autosave');
     if (saved) {
+      setRestoring(true); // <--- Add this
       const data = JSON.parse(saved);
       setMatchup(data.matchup || { home: '', away: '' });
       setRosters(data.rosters || {});
@@ -61,7 +63,6 @@ export default function StatTrackerApp() {
       setPlayByPlay(data.playByPlay || []);
       setActivePlayers(data.activePlayers || { teamA: [], teamB: [] });
       setStarterSelection(data.starterSelection || { teamA: [], teamB: [] });
-      // If you want to restore selectedEvent, add:
       if (data.selectedEvent) setSelectedEvent(data.selectedEvent);
     }
     setShowResumePrompt(false);
@@ -83,6 +84,7 @@ export default function StatTrackerApp() {
 
   // Fetch teams and rosters from Supabase
   useEffect(() => {
+    if (restoring) return; // <--- Add this line
     async function fetchData() {
       const teamRes = await fetch('/api/getTeams');
       const teamData = await teamRes.json();
@@ -126,7 +128,7 @@ export default function StatTrackerApp() {
       setTeamNames(teamList);
     }
     fetchData();
-  }, []);
+  }, [restoring]);
 
   // Handle matchup confirmation and set teams for tracking
   const confirmMatchup = () => {

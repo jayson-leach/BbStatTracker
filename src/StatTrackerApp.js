@@ -37,6 +37,58 @@ export default function StatTrackerApp() {
   const [editPlayerName, setEditPlayerName] = useState('');
   const [editPlayerNewName, setEditPlayerNewName] = useState('');
   const [editPlayerNewNumber, setEditPlayerNewNumber] = useState('');
+  // Resume prompt for autosave
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
+
+  // On mount, check for autosaved data
+  useEffect(() => {
+    const saved = localStorage.getItem('bbstat_autosave');
+    if (saved) setShowResumePrompt(true);
+  }, []);
+
+  // Autosave on key state changes
+  useEffect(() => {
+    const data = {
+      matchup,
+      rosters,
+      stats,
+      history,
+      stage,
+      teams,
+      period,
+      playByPlay,
+      activePlayers,
+      starterSelection,
+    };
+    localStorage.setItem('bbstat_autosave', JSON.stringify(data));
+  }, [matchup, rosters, stats, history, stage, teams, period, playByPlay, activePlayers, starterSelection]);
+
+  // Handler to resume from autosave
+  const handleResume = () => {
+    stage = 'tracking'; // Set stage to tracking if resuming
+    const saved = localStorage.getItem('bbstat_autosave');
+    if (saved) {
+      const data = JSON.parse(saved);
+      setMatchup(data.matchup || { home: '', away: '' });
+      setRosters(data.rosters || {});
+      setStats(data.stats || {});
+      setHistory(data.history || []);
+      setStage(data.stage || 'matchup');
+      setTeams(data.teams || { teamA: [], teamB: [] });
+      setPeriod(data.period || 1);
+      setPlayByPlay(data.playByPlay || []);
+      setActivePlayers(data.activePlayers || { teamA: [], teamB: [] });
+      setStarterSelection(data.starterSelection || { teamA: [], teamB: [] });
+    }
+    setShowResumePrompt(false);
+  };
+
+  // Handler to reset and clear autosave
+  const handleReset = () => {
+    localStorage.removeItem('bbstat_autosave');
+    setShowResumePrompt(false);
+    window.location.reload();
+  };
 
   // Reset starter selection when stage changes to 'matchup'
   useEffect(() => {
@@ -917,6 +969,33 @@ function formatStatsForExport(stats, rosters, gameId) {
       // Default
       return {};
     };
+
+    // Prompt UI
+  if (showResumePrompt) {
+    return (
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+        background: 'rgba(0,0,0,0.3)', display: 'flex',
+        alignItems: 'center', justifyContent: 'center', zIndex: 2000
+      }}>
+        <div style={{
+          background: '#fff', padding: 32, borderRadius: 10, minWidth: 320,
+          boxShadow: '0 2px 12px rgba(0,0,0,0.15)', textAlign: 'center'
+        }}>
+          <h2>Resume Previous Session?</h2>
+          <p>We found autosaved stats from a previous session. Would you like to resume or start over?</p>
+          <div style={{ marginTop: 24 }}>
+            <button onClick={handleResume} style={{ marginRight: 16, background: '#41b551', color: '#fff', padding: '8px 20px', borderRadius: 6 }}>
+              Resume
+            </button>
+            <button onClick={handleReset} style={{ background: '#f25c5c', color: '#fff', padding: '8px 20px', borderRadius: 6 }}>
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
     return (
       <div>

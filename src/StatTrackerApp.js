@@ -18,9 +18,7 @@ export default function StatTrackerApp() {
     teamA: [],
     teamB: []
   });
-  const [subOutPlayer, setSubOutPlayer] = useState(null);
   const [starterSelection, setStarterSelection] = useState({ teamA: [], teamB: [] });
-  const [subMenu, setSubMenu] = useState({ teamKey: null, outPlayer: null });
   // State for bench add number input
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [addPlayerTeam, setAddPlayerTeam] = useState('');
@@ -110,21 +108,6 @@ export default function StatTrackerApp() {
       teamA: sortPlayersByNumber(homeRoster), 
       teamB: sortPlayersByNumber(awayRoster) 
     });
-    // Initialize active players with the first 5 from each team
-    if (teams.teamA.length && teams.teamB.length) {
-      const allPlayers = [...teams.teamA, ...teams.teamB];
-      const freshStats = {};
-      allPlayers.forEach((p) => {
-        freshStats[p['Player Name']] = {
-          points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
-          blocks: 0, fouls: 0, turnovers: 0,
-          fgMade: 0, fgAttempted: 0,
-          threeMade: 0, threeAttempted: 0,
-          ftMade: 0, ftAttempted: 0,
-        };
-      });
-      setStats(freshStats);
-    }
     console.log('Matchup confirmed:', matchup);
     setStage('starters');
   };
@@ -280,47 +263,29 @@ useEffect(() => {
         teamA: starterSelection.teamA,
         teamB: starterSelection.teamB
       });
+
+    // Only add stats for new players if not already present, do not reset existing stats
+    const allPlayers = [...teams.teamA, ...teams.teamB];
+    setStats(prev => {
+      const updated = { ...prev };
+      allPlayers.forEach(p => {
+        if (!updated[p['Player Name']]) {
+          updated[p['Player Name']] = {
+            points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
+            blocks: 0, fouls: 0, turnovers: 0,
+            fgMade: 0, fgAttempted: 0,
+            threeMade: 0, threeAttempted: 0,
+            ftMade: 0, ftAttempted: 0,
+          };
+        }
+      });
+      return updated;
+    });
+
       setStage('tracking');
     }
   };
-
-  // Handle player substitution when a player is clicked to be subbed out
-  const handleSubOutClick = (teamKey, player) => {
-    setSubMenu({ teamKey, outPlayer: player });
-  };
-
-  // Handle player substitution when a player is selected to be subbed in
-  const handleSubIn = (inPlayer) => {
-    const { teamKey, outPlayer } = subMenu;
-    if (!teamKey || !outPlayer || !inPlayer) return;
-    onSubstitute(teamKey, outPlayer, inPlayer);
-    setSubMenu({ teamKey: null, outPlayer: null });
-  };
-
-  // Perform the substitution by replacing the out player with the in player
-  const onSubstitute = (teamKey, outPlayer, inPlayer) => {
-    setActivePlayers(prev => {
-      const updated = { ...prev };
-      const newLineup = prev[teamKey].map(p =>
-        p['Player Name'] === outPlayer['Player Name'] ? inPlayer : p
-      );
-      updated[teamKey] = newLineup;
-      return updated;
-    });
-    setPlayByPlay(prev => [`P${period}: Substitution - #${outPlayer.Number} ${outPlayer['Player Name']} OUT, #${inPlayer.Number} ${inPlayer['Player Name']} IN`, ...prev]);
-    setHistory(prev => [
-      ...prev,
-      {
-        type: 'substitution',
-        teamKey: 'teamA', // or 'teamB'
-        outPlayer: outPlayer,
-        inPlayer: inPlayer
-      },
-    ]);
-    setSelectedStat(null);
-    setSubOutPlayer(null);
-  }
-
+  
   // If the stage is 'starters', render the starter selection UI
   if (stage === 'starters') {
     return (

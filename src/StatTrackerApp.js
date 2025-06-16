@@ -1141,7 +1141,7 @@ function formatStatsForExport(stats, rosters, gameId) {
                       {activePlayers[teamKey].map(player => (
                         <button
                           key={player.id}
-                          onClick={() => handleStatClick(p.id, player['Player Name'], player.Number)}
+                          onClick={() => handleStatClick(player.id, player['Player Name'], player.Number)}
                           style={{
                             minWidth: 160,
                             textAlign: isRight ? 'right' : 'left',

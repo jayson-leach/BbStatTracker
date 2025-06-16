@@ -889,6 +889,7 @@ function formatStatsForExport(stats, rosters, gameId) {
   Object.entries(stats).forEach(([playerID, playerStats]) => {
     // Find which team this player belongs to
     let teamKey = null;
+    let playerName = null;
     let number = null;
     for (const [key, roster] of Object.entries(rosters)) {
       const player = roster.find(p => p.id === playerID);

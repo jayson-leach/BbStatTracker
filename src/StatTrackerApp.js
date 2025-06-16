@@ -70,18 +70,17 @@ export default function StatTrackerApp() {
       rosterData.forEach(row => {
         const baseName = row.Team?.trim();
         const gender = row.Gender?.trim();
+        // Assign a unique id if missing
         const player = {
-          id: row.id,
-          'Player Name': row['Player Name']?.trim(),
-          Number: row.Number || '',
+          id: row.id || generatePlayerId(),
+          'Player Name': row['Player Name']?.trim() || row.player_name?.trim() || '',
+          Number: row.Number || row.number || '',
         };
-        if (!baseName || !gender || !player.id) return;
+        if (!baseName || !gender || !player['Player Name'] || !player.Number) return;
         const teamName = `${baseName} -- ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
-        // Only add if not already present (by name and number)
-        if (!teamMap[teamName].some(
-          p => p.id === player.id && p.Number === player.Number
-        )) {
+        // Only add if not already present (by id)
+        if (!teamMap[teamName].some(p => p.id === player.id)) {
           teamMap[teamName].push(player);
         }
       });

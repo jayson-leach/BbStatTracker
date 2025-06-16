@@ -94,7 +94,7 @@ export default function StatTrackerApp() {
       setTeamNames(teamList);
     }
     fetchData();
-  }, [restoring]);
+  }, []);
 
   // Handle matchup confirmation and set teams for tracking
   const confirmMatchup = () => {

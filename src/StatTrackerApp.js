@@ -140,6 +140,19 @@ export default function StatTrackerApp() {
     }
   }, [stage, teams]);
 
+
+// When opening the substitution menu, set subSelection to current activePlayers
+useEffect(() => {
+  if (selectedStat && selectedStat.label === 'Substitution') {
+    setSubSelection({
+      teamA: activePlayers.teamA,
+      teamB: activePlayers.teamB
+    });
+  }
+  // Only run when substitution menu is opened or activePlayers change
+  // eslint-disable-next-line
+}, [selectedStat, activePlayers]);
+
   // Prepare team options for the select dropdown
   const teamOptions = teamNames.sort().map((name) => ({ value: name, label: name }));
 
@@ -889,6 +902,7 @@ function formatStatsForExport(stats, rosters, gameId) {
 
   return allStats;
 }
+
 
 
     // Helper to get button color based on stat type/label

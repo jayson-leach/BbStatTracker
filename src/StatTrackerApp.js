@@ -835,25 +835,31 @@ useEffect(() => {
     'fouls', 'turnovers',
   ];
 
-  // Create a lookup from player name to team name
+  // Create a lookup from player id to team name
   const playerTeamMap = {};
   teams.teamA.forEach(p => playerTeamMap[p.id] = matchup.home);
   teams.teamB.forEach(p => playerTeamMap[p.id] = matchup.away);
 
-  // a lookup from player name to their number
+  // a lookup from player id to their number
   const playerNumberMap = {};
   teams.teamA.forEach(p => playerNumberMap[p.id] = p.Number);
   teams.teamB.forEach(p => playerNumberMap[p.id] = p.Number);
 
+  // a lookup from player id to their name
+  const playerNameMap = {};
+  teams.teamA.forEach(p => playerNameMap[p.id] = p['Player Name'] || p.id);
+  teams.teamB.forEach(p => playerNameMap[p.id] = p['Player Name'] || p.id);
+
   const rows = [];
   const teamSums = {};
 
-  for (const [name, s] of Object.entries(stats)) {
-    const team = playerTeamMap[name] || 'Unknown';
+  for (const [id, s] of Object.entries(stats)) {
+    const team = playerTeamMap[id] || 'Unknown';
     rows.push([
       matchup.home+'_'+matchup.away+'_'+matchup.date+'_court'+matchup.court,
       team.split(' -- ')[0],
-      name, playerNumberMap[name] ?? null, // Use null if number is not found
+      playerNameMap[id],
+      playerNumberMap[id] ?? null, // Use null if number is not found
       s.points,
       s.fgMade, s.fgAttempted,
       s.threeMade, s.threeAttempted,
@@ -904,7 +910,7 @@ function formatStatsForExport(stats, rosters, gameId) {
       const player = roster.find(p => p.id === playerID);
       if (player) {
         teamKey = key;
-        playerName = player['Player Name'] || playerID; // Fallback to ID if name not found
+        playerName = player['Player Name'] || null; // Fallback to ID if name not found
         number = player.Number || null;
         break;
       }

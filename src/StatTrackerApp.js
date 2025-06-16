@@ -438,7 +438,7 @@ useEffect(() => {
           ? teamColors[teamKey]
           : '#eee',
         color: starterSelection[teamKey].includes(player)
-          ? '#fff'
+          ? isColorLight(teamColors[teamKey]) ? '#222' : '#fff'
           : '#222',
         border: starterSelection[teamKey].includes(player)
           ? `2px solid ${teamColors[teamKey]}`
@@ -1043,7 +1043,8 @@ function formatStatsForExport(stats, rosters, gameId) {
                             style={{
                               minWidth: 120,
                               background: isSelected ? teamColors[teamKey] : '#eee',
-                              color: isSelected ? '#fff' : '#222',
+                              color: isSelected ? isColorLight(teamColors[teamKey]) ? '#222' : '#fff'
+                              : '#222',
                               border: isSelected ? `2px solid ${teamColors[teamKey]}` : '1px solid #ccc',
                               borderRadius: 6,
                               fontWeight: 600,
@@ -1168,7 +1169,7 @@ function formatStatsForExport(stats, rosters, gameId) {
                             minWidth: 160,
                             textAlign: isRight ? 'right' : 'left',
                             background: teamColors[teamKey],
-                            color: '#fff',
+                            color: isColorLight(teamColors[teamKey]) ? '#222' : '#fff',
                             border: `2px solid ${teamColors[teamKey]}`,
                             borderRadius: 6,
                             fontWeight: 600,
@@ -1577,5 +1578,20 @@ function AddPlayerButton({ teamKey, teamName, onAdd }) {
       )}
     </>
   );
+}
+
+// Returns true if color is "light"
+function isColorLight(hex) {
+  if (!hex) return false;
+  // Remove # if present
+  hex = hex.replace('#', '');
+  // Convert 3-digit to 6-digit
+  if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+  const r = parseInt(hex.substr(0,2),16);
+  const g = parseInt(hex.substr(2,2),16);
+  const b = parseInt(hex.substr(4,2),16);
+  // Perceived brightness formula
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 180;
 }
 }

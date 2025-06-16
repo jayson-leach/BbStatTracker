@@ -868,22 +868,6 @@ useEffect(() => {
       s.assists, s.steals, s.blocks,
       s.fouls, s.turnovers,
     ]);
-
-    // Aggregate team totals
-    if (!teamSums[team]) {
-      teamSums[team] = {
-        points: 0, fgMade: 0, fgAttempted: 0,
-        threeMade: 0, threeAttempted: 0,
-        ftMade: 0, ftAttempted: 0,
-        offRebounds: 0, defRebounds: 0,
-        assists: 0, steals: 0, blocks: 0,
-        fouls: 0, turnovers: 0
-      };
-    }
-
-    for (let key in teamSums[team]) {
-      teamSums[team][key] += s[key] || 0;
-    }
   };
 
   const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');

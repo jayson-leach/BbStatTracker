@@ -260,8 +260,8 @@ useEffect(() => {
   const confirmStarters = () => {
     if (starterSelection.teamA.length === 5 && starterSelection.teamB.length === 5) {
       setActivePlayers({
-        teamA: starterSelection.teamA,
-        teamB: starterSelection.teamB
+        teamA: sortPlayersByNumber(starterSelection.teamA),
+        teamB: sortPlayersByNumber(starterSelection.teamB)
       });
 
     // Only add stats for new players if not already present, do not reset existing stats

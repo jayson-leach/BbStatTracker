@@ -96,12 +96,19 @@ export default function StatTrackerApp() {
     fetchData();
   }, []);
 
+  // Helper to sort players by number (handles string/number gracefully)
+  function sortPlayersByNumber(players) {
+    return [...players].sort((a, b) => (parseInt(a.Number, 10) || 0) - (parseInt(b.Number, 10) || 0));
+  }
   // Handle matchup confirmation and set teams for tracking
   const confirmMatchup = () => {
     if (!matchup.home || !matchup.away || matchup.home === matchup.away) return;
     const homeRoster = rosters[matchup.home];
     const awayRoster = rosters[matchup.away];
-    setTeams({ teamA: homeRoster, teamB: awayRoster });
+    setTeams({ 
+      teamA: sortPlayersByNumber(homeRoster), 
+      teamB: sortPlayersByNumber(awayRoster) 
+    });
     console.log('Matchup confirmed:', matchup);
     setStage('starters');
   };
@@ -313,14 +320,14 @@ useEffect(() => {
         if (!player['Player Name'] || !player.Number) return;
         setTeams(prev => ({
         ...prev,
-        [teamKey]: [...prev[teamKey], player]
+        [teamKey]: sortPlayersByNumber([...prev[teamKey], player])
         }));
         setRosters(prev => ({
         ...prev,
-        [teamKey === 'teamA' ? matchup.home : matchup.away]: [
+        [teamKey === 'teamA' ? matchup.home : matchup.away]: sortPlayersByNumber([
           ...(prev[teamKey === 'teamA' ? matchup.home : matchup.away] || []),
           player
-        ]
+        ])
         }));
         setStarterSelection(prev => {
         if (prev[teamKey].length < 5) {
@@ -486,16 +493,18 @@ useEffect(() => {
                   // Remove from teams, rosters, and starterSelection if present
                   setTeams(prev => ({
                     ...prev,
-                    [removePlayerTeam]: prev[removePlayerTeam].filter(
+                    [removePlayerTeam]: sortPlayersByNumber(prev[removePlayerTeam].filter(
                       p => p['Player Name'] !== removePlayerName
-                    )
+                    ))
                   }));
                   setRosters(prev => {
                     const teamLabel = removePlayerTeam === 'teamA' ? matchup.home : matchup.away;
                     return {
                       ...prev,
-                      [teamLabel]: (prev[teamLabel] || []).filter(
-                        p => p['Player Name'] !== removePlayerName
+                      [teamLabel]: sortPlayersByNumber(
+                        (prev[teamLabel] || []).filter(
+                          p => p['Player Name'] !== removePlayerName
+                        )
                       )
                     };
                   });
@@ -603,10 +612,12 @@ useEffect(() => {
                   // Update in teams
                   setTeams(prev => ({
                     ...prev,
-                    [editPlayerTeam]: prev[editPlayerTeam].map(p =>
-                      p['Player Name'] === editPlayerName
-                        ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
-                        : p
+                    [editPlayerTeam]: sortPlayersByNumber(
+                      prev[editPlayerTeam].map(p =>
+                        p['Player Name'] === editPlayerName
+                          ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
+                          : p
+                      )
                     )
                   }));
                   // Update in rosters
@@ -614,10 +625,12 @@ useEffect(() => {
                     const teamLabel = editPlayerTeam === 'teamA' ? matchup.home : matchup.away;
                     return {
                       ...prev,
-                      [teamLabel]: (prev[teamLabel] || []).map(p =>
-                        p['Player Name'] === editPlayerName
-                          ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
-                          : p
+                      [teamLabel]: sortPlayersByNumber(
+                        (prev[teamLabel] || []).map(p =>
+                          p['Player Name'] === editPlayerName
+                            ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
+                            : p
+                        )
                       )
                     };
                   });
@@ -905,7 +918,7 @@ function formatStatsForExport(stats, rosters, gameId) {
 
 
 
-    // Helper to get button color based on stat type/label
+// Helper to get button color based on stat type/label
     const getActionButtonStyle = (btn) => {
       // Misses: pastel red
       if (btn.label && btn.label.startsWith('Miss') || btn.label === 'Foul' || btn.label === 'Turnover') {
@@ -1309,14 +1322,14 @@ function formatStatsForExport(stats, rosters, gameId) {
             const newPlayer = { 'Player Name': addPlayerName.trim(), Number: addPlayerNumber.trim() };
             setTeams(prev => ({
               ...prev,
-              [addPlayerTeam]: [...prev[addPlayerTeam], newPlayer]
+              [addPlayerTeam]: sortPlayersByNumber([...prev[addPlayerTeam], newPlayer])
             }));
             setRosters(prev => ({
               ...prev,
-              [addPlayerTeam === 'teamA' ? matchup.home : matchup.away]: [
+              [addPlayerTeam === 'teamA' ? matchup.home : matchup.away]: sortPlayersByNumber([
                 ...(prev[addPlayerTeam === 'teamA' ? matchup.home : matchup.away] || []),
                 newPlayer
-              ]
+              ])
             }));
             setStats(prev => ({
               ...prev,
@@ -1407,14 +1420,14 @@ function formatStatsForExport(stats, rosters, gameId) {
             // Add to teams and rosters, but not activePlayers
             setTeams(prev => ({
               ...prev,
-              [addPlayerTeam]: [...prev[addPlayerTeam], newPlayer]
+              [addPlayerTeam]: sortPlayersByNumber([...prev[addPlayerTeam], newPlayer])
             }));
             setRosters(prev => ({
               ...prev,
-              [addPlayerTeam === 'teamA' ? matchup.home : matchup.away]: [
+              [addPlayerTeam === 'teamA' ? matchup.home : matchup.away]: sortPlayersByNumber([
                 ...(prev[addPlayerTeam === 'teamA' ? matchup.home : matchup.away] || []),
                 newPlayer
-              ]
+              ])
             }));
             setStats(prev => ({
               ...prev,
@@ -1444,7 +1457,7 @@ function formatStatsForExport(stats, rosters, gameId) {
       </div>
     );
 }
-}
+
 
 function AddPlayerButton({ teamKey, teamName, onAdd }) {
   const [show, setShow] = useState(false);
@@ -1516,4 +1529,5 @@ function AddPlayerButton({ teamKey, teamName, onAdd }) {
       )}
     </>
   );
+}
 }

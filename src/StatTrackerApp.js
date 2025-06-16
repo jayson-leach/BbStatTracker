@@ -904,6 +904,7 @@ function formatStatsForExport(stats, rosters, gameId) {
       const player = roster.find(p => p.id === playerID);
       if (player) {
         teamKey = key;
+        playerName = player['Player Name'] || playerID; // Fallback to ID if name not found
         number = player.Number || null;
         break;
       }

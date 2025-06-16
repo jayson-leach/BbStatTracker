@@ -1216,7 +1216,7 @@ function formatStatsForExport(stats, rosters, gameId) {
                       {[...teams[teamKey]].map((p) => (
                         <tr key={p.id} className="text-center">
                           <td>{p.Number}</td>
-                          <td>{p.id}</td>
+                          <td>{p['Player Name']}</td>
                           <td>{stats[p.id].points}</td>
                           <td>{stats[p.id].fgMade}/{stats[p.id].fgAttempted}</td>
                           <td>{stats[p.id].threeMade}/{stats[p.id].threeAttempted}</td>

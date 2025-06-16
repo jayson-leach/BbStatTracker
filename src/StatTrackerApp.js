@@ -28,11 +28,11 @@ export default function StatTrackerApp() {
   // New states for removing players
   const [showRemovePlayer, setShowRemovePlayer] = useState(false);
   const [removePlayerTeam, setRemovePlayerTeam] = useState('');
-  const [removePlayerName, setRemovePlayerName] = useState('');
+  const [removePlayerId, setRemovePlayerId] = useState('');
   // New states for editng players
   const [showEditPlayer, setShowEditPlayer] = useState(false);
   const [editPlayerTeam, setEditPlayerTeam] = useState('');
-  const [editPlayerName, setEditPlayerName] = useState('');
+  const [editPlayerId, setEditPlayerId] = useState('');
   const [editPlayerNewName, setEditPlayerNewName] = useState('');
   const [editPlayerNewNumber, setEditPlayerNewNumber] = useState('');
   // New substitution states
@@ -378,7 +378,7 @@ useEffect(() => {
         style={{ marginLeft: 8 }}
         onClick={() => {
           setEditPlayerTeam(teamKey);
-          setEditPlayerName('');
+          setEditPlayerId('');
           setEditPlayerNewName('');
           setEditPlayerNewNumber('');
           setShowEditPlayer(true);
@@ -393,7 +393,7 @@ useEffect(() => {
       <div>
       {teams[teamKey].map(player => (
       <button
-      key={player['Player Name']}
+      key={player.id}
       className={`toggle-starter-button ${starterSelection[teamKey].includes(player) ? 'active' : ''}`}
       onClick={() => toggleStarter(teamKey, player)}
       style={{
@@ -461,7 +461,7 @@ useEffect(() => {
                   value={removePlayerTeam}
                   onChange={e => {
                     setRemovePlayerTeam(e.target.value);
-                    setRemovePlayerName(''); // Reset player selection when team changes
+                    setRemovePlayerId(''); // Reset player selection when team changes
                   }}
                   style={{ marginLeft: 8, marginBottom: 8 }}
                 >
@@ -475,14 +475,14 @@ useEffect(() => {
               <label>
                 Player:
                 <select
-                  value={removePlayerName}
-                  onChange={e => setRemovePlayerName(e.target.value)}
+                  value={removePlayerId}
+                  onChange={e => setRemovePlayerId(e.target.value)}
                   style={{ marginLeft: 8, minWidth: 140 }}
                   disabled={!removePlayerTeam}
                 >
                   <option value="">Select Player</option>
                   {removePlayerTeam && teams[removePlayerTeam].map(p => (
-                    <option key={p['Player Name']} value={p['Player Name']}>
+                    <option key={p.id} value={p.id}>
                       #{p.Number} {p['Player Name']}
                     </option>
                   ))}
@@ -492,13 +492,13 @@ useEffect(() => {
             <div style={{ marginTop: 16 }}>
               <button
                 style={{ background: '#f25c5c', marginRight: 8 }}
-                disabled={!removePlayerTeam || !removePlayerName}
+                disabled={!removePlayerTeam || !removePlayerId}
                 onClick={() => {
                   // Remove from teams, rosters, and starterSelection if present
                   setTeams(prev => ({
                     ...prev,
                     [removePlayerTeam]: sortPlayersByNumber(prev[removePlayerTeam].filter(
-                      p => p['Player Name'] !== removePlayerName
+                      p => p.id !== removePlayerId
                     ))
                   }));
                   setRosters(prev => {
@@ -507,7 +507,7 @@ useEffect(() => {
                       ...prev,
                       [teamLabel]: sortPlayersByNumber(
                         (prev[teamLabel] || []).filter(
-                          p => p['Player Name'] !== removePlayerName
+                          p => p.id !== removePlayerId
                         )
                       )
                     };
@@ -515,12 +515,25 @@ useEffect(() => {
                   setStarterSelection(prev => ({
                     ...prev,
                     [removePlayerTeam]: prev[removePlayerTeam].filter(
-                      p => p['Player Name'] !== removePlayerName
+                      p => p.id !== removePlayerId
                     )
                   }));
+                  // Remove from activePlayers if present
+                  setActivePlayers(prev => ({
+                    ...prev,
+                    [removePlayerTeam]: prev[removePlayerTeam].filter(
+                      p => p.id !== removePlayerId
+                    )
+                  }));
+                  // Optionally remove from stats as well
+                  setStats(prev => {
+                    const updated = { ...prev };
+                    delete updated[removePlayerId];
+                    return updated;
+                  });
                   setShowRemovePlayer(false);
                   setRemovePlayerTeam('');
-                  setRemovePlayerName('');
+                  setRemovePlayerId('');
                 }}
               >
                 Confirm Remove
@@ -529,7 +542,7 @@ useEffect(() => {
                 onClick={() => {
                   setShowRemovePlayer(false);
                   setRemovePlayerTeam('');
-                  setRemovePlayerName('');
+                  setRemovePlayerId('');
                 }}
               >
                 Cancel
@@ -561,11 +574,11 @@ useEffect(() => {
               <label>
                 Player:
                 <select
-                  value={editPlayerName}
+                  value={editPlayerId}
                   onChange={e => {
-                    const name = e.target.value;
-                    setEditPlayerName(name);
-                    const player = teams[editPlayerTeam].find(p => p['Player Name'] === name);
+                    const id = e.target.value;
+                    setEditPlayerId(id);
+                    const player = teams[editPlayerTeam].find(p => p.id === id);
                     setEditPlayerNewName(player ? player['Player Name'] : '');
                     setEditPlayerNewNumber(player ? player.Number : '');
                   }}
@@ -573,7 +586,7 @@ useEffect(() => {
                 >
                   <option value="">Select Player</option>
                   {teams[editPlayerTeam].map(p => (
-                    <option key={p['Player Name']} value={p['Player Name']}>
+                    <option key={p.id} value={p.id}>
                       #{p.Number} {p['Player Name']}
                     </option>
                   ))}
@@ -588,7 +601,7 @@ useEffect(() => {
                   value={editPlayerNewName}
                   onChange={e => setEditPlayerNewName(e.target.value)}
                   style={{ marginLeft: 8, width: 140 }}
-                  disabled={!editPlayerName}
+                  disabled={!editPlayerId}
                 />
               </label>
             </div>
@@ -600,7 +613,7 @@ useEffect(() => {
                   value={editPlayerNewNumber}
                   onChange={e => setEditPlayerNewNumber(e.target.value)}
                   style={{ marginLeft: 8, width: 60 }}
-                  disabled={!editPlayerName}
+                  disabled={!editPlayerId}
                 />
               </label>
             </div>
@@ -608,7 +621,7 @@ useEffect(() => {
               <button
                 style={{ marginRight: 8 }}
                 disabled={
-                  !editPlayerName ||
+                  !editPlayerId ||
                   !editPlayerNewName.trim() ||
                   !editPlayerNewNumber.trim()
                 }
@@ -618,7 +631,7 @@ useEffect(() => {
                     ...prev,
                     [editPlayerTeam]: sortPlayersByNumber(
                       prev[editPlayerTeam].map(p =>
-                        p['Player Name'] === editPlayerName
+                        p.id === editPlayerId
                           ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
                           : p
                       )
@@ -631,7 +644,7 @@ useEffect(() => {
                       ...prev,
                       [teamLabel]: sortPlayersByNumber(
                         (prev[teamLabel] || []).map(p =>
-                          p['Player Name'] === editPlayerName
+                          p.id === editPlayerId
                             ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
                             : p
                         )
@@ -642,14 +655,14 @@ useEffect(() => {
                   setStarterSelection(prev => ({
                     ...prev,
                     [editPlayerTeam]: prev[editPlayerTeam].map(p =>
-                      p['Player Name'] === editPlayerName
+                      p.id === editPlayerId
                         ? { ...p, 'Player Name': editPlayerNewName.trim(), Number: editPlayerNewNumber.trim() }
                         : p
                     )
                   }));
                   setShowEditPlayer(false);
                   setEditPlayerTeam('');
-                  setEditPlayerName('');
+                  setEditPlayerId('');
                   setEditPlayerNewName('');
                   setEditPlayerNewNumber('');
                 }}
@@ -660,7 +673,7 @@ useEffect(() => {
                 onClick={() => {
                   setShowEditPlayer(false);
                   setEditPlayerTeam('');
-                  setEditPlayerName('');
+                  setEditPlayerId('');
                   setEditPlayerNewName('');
                   setEditPlayerNewNumber('');
                 }}
@@ -1331,7 +1344,7 @@ function formatStatsForExport(stats, rosters, gameId) {
         <button
           onClick={() => {
             if (!addPlayerTeam || !addPlayerName.trim() || !addPlayerNumber.trim()) return;
-            const newPlayer = { 'Player Name': addPlayerName.trim(), Number: addPlayerNumber.trim() };
+            const newPlayer = { id: generatePlayerId(), 'Player Name': addPlayerName.trim(), Number: addPlayerNumber.trim() };
             setTeams(prev => ({
               ...prev,
               [addPlayerTeam]: sortPlayersByNumber([...prev[addPlayerTeam], newPlayer])
@@ -1428,7 +1441,7 @@ function formatStatsForExport(stats, rosters, gameId) {
               name = `Unknown ${n}`;
               n++;
             } while (allPlayers.some(p => p['Player Name'] === name));
-            const newPlayer = { 'Player Name': name, Number: addPlayerNumber.trim() };
+            const newPlayer = { id: generatePlayerId(), 'Player Name': name, Number: addPlayerNumber.trim() };
             // Add to teams and rosters, but not activePlayers
             setTeams(prev => ({
               ...prev,
@@ -1521,6 +1534,7 @@ function AddPlayerButton({ teamKey, teamName, onAdd }) {
                 onClick={() => {
                   if (!name.trim()) return;
                   onAdd({
+                    id: generatePlayerId(),
                     'Player Name': name.trim(),
                     Number: number.trim()
                   });
@@ -1556,5 +1570,10 @@ function isColorLight(hex) {
   // Perceived brightness formula
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   return brightness > 180;
+}
+
+// 1. Helper to generate a unique id (simple timestamp + random)
+function generatePlayerId() {
+  return 'p_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }
 }

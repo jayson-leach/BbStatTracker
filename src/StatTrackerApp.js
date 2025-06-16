@@ -441,7 +441,7 @@ useEffect(() => {
           ? isColorLight(teamColors[teamKey]) ? '#222' : '#fff'
           : '#222',
         border: starterSelection[teamKey].includes(player)
-          ? `2px solid ${teamColors[teamKey]}`
+          ? `2px solid ${isColorLight(teamColors[teamKey]) ? '#222' : teamColors[teamKey]}`
           : '1px solid #ccc',
         borderRadius: 6,
         fontWeight: 600,
@@ -1045,7 +1045,7 @@ function formatStatsForExport(stats, rosters, gameId) {
                               background: isSelected ? teamColors[teamKey] : '#eee',
                               color: isSelected ? isColorLight(teamColors[teamKey]) ? '#222' : '#fff'
                               : '#222',
-                              border: isSelected ? `2px solid ${teamColors[teamKey]}` : '1px solid #ccc',
+                              border: isSelected ? `2px solid ${isColorLight(teamColors[teamKey]) ? '#222' : teamColors[teamKey]}` : '1px solid #ccc',
                               borderRadius: 6,
                               fontWeight: 600,
                               padding: '6px 12px',
@@ -1170,7 +1170,7 @@ function formatStatsForExport(stats, rosters, gameId) {
                             textAlign: isRight ? 'right' : 'left',
                             background: teamColors[teamKey],
                             color: isColorLight(teamColors[teamKey]) ? '#222' : '#fff',
-                            border: `2px solid ${teamColors[teamKey]}`,
+                            border: `2px solid ${isColorLight(teamColors[teamKey]) ? '#222' : teamColors[teamKey]}`,
                             borderRadius: 6,
                             fontWeight: 600,
                             margin: 4,

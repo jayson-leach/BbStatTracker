@@ -40,6 +40,7 @@ export default function StatTrackerApp() {
   // New substitution states
   const [subSelection, setSubSelection] = useState({ teamA: [], teamB: [] });
   const [subTeamKey, setSubTeamKey] = useState(null);
+  const [teamColors, setTeamColors] = useState({ teamA: '#6366f1', teamB: '#f25c5c' });
 
 
   // Reset starter selection when stage changes to 'matchup'
@@ -186,56 +187,80 @@ useEffect(() => {
       </div>
     <br />
 
-        <p>Home Team</p>
-        <Select
-        options={teamOptions}
-        value={matchup.home ? { value: matchup.home, label: matchup.home } : null}
-        onChange={(opt) => setMatchup((prev) => ({ ...prev, home: opt?.value || '' }))}
-        placeholder="Select home team"
-        />
+          <p>Home Team</p>
+          <Select
+            options={teamOptions}
+            value={matchup.home ? { value: matchup.home, label: matchup.home } : null}
+            onChange={(opt) => setMatchup((prev) => ({ ...prev, home: opt?.value || '' }))}
+            placeholder="Select home team"
+          />
+          <div style={{ marginTop: 8, marginBottom: 16 }}>
+            <label>
+              Home Team Color:&nbsp;
+              <input
+                type="color"
+                value={teamColors.teamA}
+                onChange={e => setTeamColors(prev => ({ ...prev, teamA: e.target.value }))}
+                style={{ width: 40, height: 28, verticalAlign: 'middle', border: 'none', background: 'none' }}
+              />
+            </label>
+          </div>
+          <br />
+
+          <p>Away Team</p>
+          <Select
+            options={teamOptions}
+            value={matchup.away ? { value: matchup.away, label: matchup.away } : null}
+            onChange={(opt) => setMatchup((prev) => ({ ...prev, away: opt?.value || '' }))}
+            placeholder="Select away team"
+          />
+          <div style={{ marginTop: 8, marginBottom: 16 }}>
+            <label>
+              Away Team Color:&nbsp;
+              <input
+                type="color"
+                value={teamColors.teamB}
+                onChange={e => setTeamColors(prev => ({ ...prev, teamB: e.target.value }))}
+                style={{ width: 40, height: 28, verticalAlign: 'middle', border: 'none', background: 'none' }}
+              />
+            </label>
+          </div>
+          <br />
+
+          <p>Date</p>
+          <input
+            type="date"
+            style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}
+            value={matchup.date || ''}
+            onChange={opt => setMatchup(prev => ({ ...prev, date: opt.target.value }))}
+          />
+          <br />
+          <br />
+          <p>Court Number</p>
+          <input
+            type="number"
+            min={1}
+            max={30}
+            style={{ fontSize: '1rem', padding: '0.5rem 1rem', width: 120 }}
+            value={matchup.court || ''}
+            onChange={e => setMatchup(prev => ({ ...prev, court: e.target.value ? Number(e.target.value) : '' }))}
+            placeholder="Court #"
+          />
+        </div>
         <br />
-        <p>Away Team</p>
-        <Select
-        options={teamOptions}
-        value={matchup.away ? { value: matchup.away, label: matchup.away } : null}
-        onChange={(opt) => setMatchup((prev) => ({ ...prev, away: opt?.value || '' }))}
-        placeholder="Select away team"
-        />
-        <br />
-        <p>Date</p>
-        <input
-        type="date"
-        style={{ fontSize: '1rem', padding: '0.5rem 1rem' }}
-        value={matchup.date || ''}
-        onChange={opt => setMatchup(prev => ({ ...prev, date: opt.target.value }))}
-        />
-        <br />
-        <br />
-        <p>Court Number</p>
-        <input
-        type="number"
-        min={1}
-        max={30}
-        style={{ fontSize: '1rem', padding: '0.5rem 1rem', width: 120 }}
-        value={matchup.court || ''}
-        onChange={e => setMatchup(prev => ({ ...prev, court: e.target.value ? Number(e.target.value) : '' }))}
-        placeholder="Court #"
-        />
-      </div>
-      <br />
-      <button
-        className="disabled:opacity-50"
-        onClick={confirmMatchup}
-        disabled={
-        !matchup.home ||
-        !matchup.away ||
-        matchup.home === matchup.away ||
-        !matchup.court ||
-        !matchup.date
-        }
-      >
-        Confirm Matchup
-      </button>
+        <button
+          className="disabled:opacity-50"
+          onClick={confirmMatchup}
+          disabled={
+            !matchup.home ||
+            !matchup.away ||
+            matchup.home === matchup.away ||
+            !matchup.court ||
+            !matchup.date
+          }
+        >
+          Confirm Matchup
+        </button>
       </div>
     );
   }

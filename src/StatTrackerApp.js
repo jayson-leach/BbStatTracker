@@ -110,6 +110,21 @@ export default function StatTrackerApp() {
       teamA: sortPlayersByNumber(homeRoster), 
       teamB: sortPlayersByNumber(awayRoster) 
     });
+    // Initialize active players with the first 5 from each team
+    if (teams.teamA.length && teams.teamB.length) {
+      const allPlayers = [...teams.teamA, ...teams.teamB];
+      const freshStats = {};
+      allPlayers.forEach((p) => {
+        freshStats[p['Player Name']] = {
+          points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
+          blocks: 0, fouls: 0, turnovers: 0,
+          fgMade: 0, fgAttempted: 0,
+          threeMade: 0, threeAttempted: 0,
+          ftMade: 0, ftAttempted: 0,
+        };
+      });
+      setStats(freshStats);
+    }
     console.log('Matchup confirmed:', matchup);
     setStage('starters');
   };
@@ -130,23 +145,6 @@ export default function StatTrackerApp() {
     return initial;
   });
 
-  // Reset stats when stage changes to 'starters' and teams are set
-  useEffect(() => {
-    if (stage === 'starters' && teams.teamA.length && teams.teamB.length) {
-      const allPlayers = [...teams.teamA, ...teams.teamB];
-      const freshStats = {};
-      allPlayers.forEach((p) => {
-        freshStats[p['Player Name']] = {
-          points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
-          blocks: 0, fouls: 0, turnovers: 0,
-          fgMade: 0, fgAttempted: 0,
-          threeMade: 0, threeAttempted: 0,
-          ftMade: 0, ftAttempted: 0,
-        };
-      });
-      setStats(freshStats);
-    }
-  }, [stage, teams]);
 
 
 // When opening the substitution menu, set subSelection to current activePlayers

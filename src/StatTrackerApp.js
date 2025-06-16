@@ -433,6 +433,22 @@ useEffect(() => {
       key={player['Player Name']}
       className={`toggle-starter-button ${starterSelection[teamKey].includes(player) ? 'active' : ''}`}
       onClick={() => toggleStarter(teamKey, player)}
+      style={{
+        background: starterSelection[teamKey].includes(player)
+          ? teamColors[teamKey]
+          : '#eee',
+        color: starterSelection[teamKey].includes(player)
+          ? '#fff'
+          : '#222',
+        border: starterSelection[teamKey].includes(player)
+          ? `2px solid ${teamColors[teamKey]}`
+          : '1px solid #ccc',
+        borderRadius: 6,
+        fontWeight: 600,
+        minWidth: 120,
+        margin: 4,
+        padding: '6px 12px'
+      }}
       >
       #{player.Number} {player['Player Name']}
       </button>
@@ -1026,9 +1042,9 @@ function formatStatsForExport(stats, rosters, gameId) {
                             key={player['Player Name']}
                             style={{
                               minWidth: 120,
-                              background: isSelected ? '#6366f1' : '#eee',
+                              background: isSelected ? teamColors[teamKey] : '#eee',
                               color: isSelected ? '#fff' : '#222',
-                              border: isSelected ? '2px solid #6366f1' : '1px solid #ccc',
+                              border: isSelected ? `2px solid ${teamColors[teamKey]}` : '1px solid #ccc',
                               borderRadius: 6,
                               fontWeight: 600,
                               padding: '6px 12px',
@@ -1150,7 +1166,14 @@ function formatStatsForExport(stats, rosters, gameId) {
                           onClick={() => handleStatClick(player['Player Name'], player.Number)}
                           style={{
                             minWidth: 160,
-                            textAlign: isRight ? 'right' : 'left'
+                            textAlign: isRight ? 'right' : 'left',
+                            background: teamColors[teamKey],
+                            color: '#fff',
+                            border: `2px solid ${teamColors[teamKey]}`,
+                            borderRadius: 6,
+                            fontWeight: 600,
+                            margin: 4,
+                            padding: '6px 12px'
                           }}
                         >
                           #{player.Number} {player['Player Name']}

@@ -40,6 +40,8 @@ export default function StatTrackerApp() {
   // Resume prompt for autosave
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [subSelection, setSubSelection] = useState({ teamA: [], teamB: [] });
+  const [subTeamKey, setSubTeamKey] = useState(null);
 
   // On mount, check for autosaved data
   useEffect(() => {
@@ -799,12 +801,10 @@ export default function StatTrackerApp() {
     setHistory(prev => prev.slice(0, -1));
     setPlayByPlay(prev => prev.slice(1));
 
-    if (last.type === 'substitution') {
-    onSubstitute(last.teamKey, last.inPlayer, last.outPlayer);
-    setHistory(prev => prev.slice(0, -1));
-    setPlayByPlay(prev => prev.slice(1));
-    return;
-  }
+    if (last.type === 'substitution' && last.prevActive && last.newActive) {
+      setActivePlayers(last.prevActive);
+      return;
+    }
 
     // Handle stat undo
     setStats(prev => {
@@ -1044,103 +1044,117 @@ function formatStatsForExport(stats, rosters, gameId) {
 
         {selectedStat && selectedStat.label === 'Substitution' && (
           <div>
-            <h2>Select a player for: {selectedStat.label}</h2>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 32 }}>
-              {['teamA', 'teamB'].map((teamKey, idx) => {
-                const bench = teams[teamKey].filter(p => !activePlayers[teamKey].includes(p));
-                const isRight = teamKey === 'teamB';
+            <h2>Select Active Lineup</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 32 }}>
+              {['teamA', 'teamB'].map(teamKey => {
+                const teamPlayers = teams[teamKey];
+                const selected = subSelection[teamKey] || [];
                 return (
-                  <div
-                    key={teamKey}
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: isRight ? 'flex-end' : 'flex-start',
-                    }}
-                  >
-                    <h3 style={{ textAlign: isRight ? 'right' : 'left', width: '100%' }}>
-                      {teamKey === 'teamA' ? matchup.home : matchup.away}
-                    </h3>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: isRight ? 'flex-end' : 'flex-start',
-                        gap: 8,
-                      }}
-                    >
-                      {activePlayers[teamKey].map(p => (
-                        <div key={p['Player Name']} style={{ width: '100%' }}>
+                  <div key={teamKey} style={{ flex: 1 }}>
+                    <h3>{teamKey === 'teamA' ? matchup.home : matchup.away}</h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {teamPlayers.map(player => {
+                        const isSelected = selected.some(p => p['Player Name'] === player['Player Name']);
+                        return (
                           <button
-                            onClick={() => handleSubOutClick(teamKey, p)}
+                            key={player['Player Name']}
                             style={{
-                              minWidth: 160,
-                              textAlign: isRight ? 'right' : 'left'
+                              minWidth: 120,
+                              background: isSelected ? '#6366f1' : '#eee',
+                              color: isSelected ? '#fff' : '#222',
+                              border: isSelected ? '2px solid #6366f1' : '1px solid #ccc',
+                              borderRadius: 6,
+                              fontWeight: 600,
+                              padding: '6px 12px',
+                            }}
+                            onClick={() => {
+                              setSubSelection(prev => {
+                                const already = prev[teamKey]?.some(p => p['Player Name'] === player['Player Name']);
+                                let updated;
+                                if (already) {
+                                  updated = prev[teamKey].filter(p => p['Player Name'] !== player['Player Name']);
+                                } else {
+                                  updated = [...(prev[teamKey] || []), player];
+                                }
+                                // Only allow max 5
+                                if (updated.length > 5) return prev;
+                                return { ...prev, [teamKey]: updated };
+                              });
+                              setSubTeamKey(teamKey);
                             }}
                           >
-                            Sub Out #{p.Number} {p['Player Name']}
+                            #{player.Number} {player['Player Name']}
                           </button>
-                        </div>
-                      ))}
+                        );
+                      })}
+                    </div>
+                    <div style={{ marginTop: 8, color: '#888', fontSize: 13 }}>
+                      Selected: {(subSelection[teamKey] || []).length}/5
                     </div>
                   </div>
                 );
               })}
             </div>
-            {/* Sub In buttons row, horizontally aligned below both teams */}
-            {subMenu.teamKey && (
-              <div
+            <div style={{ marginTop: 24 }}>
+              <button
+                disabled={
+                  !subSelection.teamA || !subSelection.teamB ||
+                  subSelection.teamA.length !== 5 || subSelection.teamB.length !== 5
+                }
+                onClick={() => {
+                  // Save previous activePlayers for history
+                  const prevActive = {
+                    teamA: activePlayers.teamA,
+                    teamB: activePlayers.teamB
+                  };
+                  setActivePlayers({
+                    teamA: subSelection.teamA,
+                    teamB: subSelection.teamB
+                  });
+                  setHistory(prev => [
+                    ...prev,
+                    {
+                      type: 'substitution',
+                      prevActive,
+                      newActive: { teamA: subSelection.teamA, teamB: subSelection.teamB }
+                    }
+                  ]);
+                  setPlayByPlay(prev => [
+                    `P${period}: Substitution - New lineup set`,
+                    ...prev
+                  ]);
+                  setSelectedStat(null);
+                  setSubSelection({ teamA: [], teamB: [] });
+                  setSubTeamKey(null);
+                }}
                 style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  marginTop: 16,
-                  gap: 32,
-                  flexWrap: 'wrap',
-                  width: '100%',
+                  background: '#6366f1',
+                  color: '#fff',
+                  padding: '8px 24px',
+                  borderRadius: 6,
+                  fontWeight: 600,
+                  marginRight: 12
                 }}
               >
-                {['teamA', 'teamB'].map((teamKey, idx) => {
-                  const bench = teams[teamKey].filter(p => !activePlayers[teamKey].includes(p));
-                  const isRight = teamKey === 'teamB';
-                  return (
-                    <div
-                      key={teamKey}
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: isRight ? 'flex-end' : 'flex-start',
-                        gap: 8,
-                        flexWrap: 'wrap',
-                        minWidth: 0,
-                        maxWidth: '100%',
-                      }}
-                    >
-                      {subMenu.teamKey === teamKey && bench.length > 0 && bench.map(player => (
-                        <button
-                          key={player['Player Name']}
-                          className="hover:bg-gray-100"
-                          style={{
-                            marginBottom: 4,
-                            minWidth: 140,
-                            maxWidth: '100%',
-                            flex: '1 1 140px',
-                            textAlign: isRight ? 'right' : 'left',
-                            background: '#8d8eeb',
-                            wordBreak: 'break-word',
-                          }}
-                          onClick={() => handleSubIn(player)}
-                        >
-                          Sub In #{player.Number} {player['Player Name']}
-                        </button>
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                Confirm Lineup
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedStat(null);
+                  setSubSelection({ teamA: [], teamB: [] });
+                  setSubTeamKey(null);
+                }}
+                style={{
+                  background: '#eee',
+                  color: '#222',
+                  padding: '8px 24px',
+                  borderRadius: 6,
+                  fontWeight: 600
+                }}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
 

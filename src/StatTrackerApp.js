@@ -71,15 +71,16 @@ export default function StatTrackerApp() {
         const baseName = row.Team?.trim();
         const gender = row.Gender?.trim();
         const player = {
+          id: row.id,
           'Player Name': row['Player Name']?.trim(),
           Number: row.Number || '',
         };
-        if (!baseName || !gender || !player['Player Name']) return;
+        if (!baseName || !gender || !player.id) return;
         const teamName = `${baseName} -- ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
         // Only add if not already present (by name and number)
         if (!teamMap[teamName].some(
-          p => p['Player Name'] === player['Player Name'] && p.Number === player.Number
+          p => p.id === player.id && p.Number === player.Number
         )) {
           teamMap[teamName].push(player);
         }
@@ -117,7 +118,7 @@ export default function StatTrackerApp() {
     const allPlayers = [...teams.teamA, ...teams.teamB];
     const initial = {};
     allPlayers.forEach(p => {
-      initial[p['Player Name']] = {
+      initial[p.id] = {
         points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
         blocks: 0, fouls: 0, turnovers: 0,
         fgMade: 0, fgAttempted: 0,
@@ -269,8 +270,8 @@ useEffect(() => {
     setStats(prev => {
       const updated = { ...prev };
       allPlayers.forEach(p => {
-        if (!updated[p['Player Name']]) {
-          updated[p['Player Name']] = {
+        if (!updated[p.id]) {
+          updated[p.id] = {
             points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
             blocks: 0, fouls: 0, turnovers: 0,
             fgMade: 0, fgAttempted: 0,
@@ -351,15 +352,16 @@ useEffect(() => {
         const baseName = row.Team?.trim();
         const gender = row.Gender?.trim();
         const playerObj = {
+          id: row.id,
           'Player Name': row.player_name?.trim(),
           Number: row.number || '',
         };
-        if (!baseName || !gender || !playerObj['Player Name']) return;
+        if (!baseName || !gender || !playerObj.id) return;
         const teamName = `${baseName} -- ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
         // Only add if not already present (by name and number)
         if (!teamMap[teamName].some(
-          p => p['Player Name'] === playerObj['Player Name'] && p.Number === playerObj.Number
+          p => p.id === playerObj.id && p.Number === playerObj.Number
         )) {
           teamMap[teamName].push(playerObj);
         }
@@ -707,14 +709,14 @@ useEffect(() => {
   ];
 
   // Handle stat click to update stats and play-by-play
-  const handleStatClick = (playerName, playerNumber) => {
+  const handleStatClick = (playerID, playerName, playerNumber) => {
     if (!selectedStat) return;
-    setHistory(prev => [...prev, { playerName, ...selectedStat }]);
+    setHistory(prev => [...prev, { playerID, ...selectedStat }]);
     setPlayByPlay(prev => [`P${period}: ${selectedStat.label} - #${playerNumber} ${playerName}`, ...prev]);
 
     setStats(prev => {
       const updated = { ...prev };
-      const pStats = { ...updated[playerName] };
+      const pStats = { ...updated[playerID] };
 
       if (selectedStat.label.startsWith('Make')) {
         if (selectedStat.label.includes('3PT')) {
@@ -745,7 +747,7 @@ useEffect(() => {
         pStats[selectedStat.stat] = (pStats[selectedStat.stat] || 0) + selectedStat.value;
       }
 
-      updated[playerName] = pStats;
+      updated[playerID] = pStats;
       return updated;
     });
     setSelectedStat(null);
@@ -765,7 +767,7 @@ useEffect(() => {
 
     // Handle stat undo
     setStats(prev => {
-      const playerStats = { ...prev[last.playerName] };
+      const playerStats = { ...prev[last.playerID] };
 
       if (last.label === 'Make 2PT') {
         playerStats.points = Math.max(playerStats.points - 2, 0);
@@ -795,7 +797,7 @@ useEffect(() => {
 
       return {
         ...prev,
-        [last.playerName]: playerStats,
+        [last.playerID]: playerStats,
       };
     });
   };
@@ -807,7 +809,7 @@ useEffect(() => {
       steals: 0, blocks: 0, fouls: 0, turnovers: 0
     };
     teams[teamKey].forEach(p => {
-      const s = stats[p['Player Name']];
+      const s = stats[p.id];
       if (s) {
         Object.keys(totals).forEach(key => {
           totals[key] += s[key] || 0;
@@ -836,13 +838,13 @@ useEffect(() => {
 
   // Create a lookup from player name to team name
   const playerTeamMap = {};
-  teams.teamA.forEach(p => playerTeamMap[p['Player Name']] = matchup.home);
-  teams.teamB.forEach(p => playerTeamMap[p['Player Name']] = matchup.away);
+  teams.teamA.forEach(p => playerTeamMap[p.id] = matchup.home);
+  teams.teamB.forEach(p => playerTeamMap[p.id] = matchup.away);
 
   // a lookup from player name to their number
   const playerNumberMap = {};
-  teams.teamA.forEach(p => playerNumberMap[p['Player Name']] = p.Number);
-  teams.teamB.forEach(p => playerNumberMap[p['Player Name']] = p.Number);
+  teams.teamA.forEach(p => playerNumberMap[p.id] = p.Number);
+  teams.teamB.forEach(p => playerNumberMap[p.id] = p.Number);
 
   const rows = [];
   const teamSums = {};
@@ -895,12 +897,12 @@ useEffect(() => {
 function formatStatsForExport(stats, rosters, gameId) {
   const allStats = [];
 
-  Object.entries(stats).forEach(([playerName, playerStats]) => {
+  Object.entries(stats).forEach(([playerID, playerStats]) => {
     // Find which team this player belongs to
     let teamKey = null;
     let number = null;
     for (const [key, roster] of Object.entries(rosters)) {
-      const player = roster.find(p => p['Player Name'] === playerName);
+      const player = roster.find(p => p.id === playerID);
       if (player) {
         teamKey = key;
         number = player.Number || null;
@@ -1012,10 +1014,10 @@ function formatStatsForExport(stats, rosters, gameId) {
                     <h3>{teamKey === 'teamA' ? matchup.home : matchup.away}</h3>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {teamPlayers.map(player => {
-                        const isSelected = selected.some(p => p['Player Name'] === player['Player Name']);
+                        const isSelected = selected.some(p => p.id === player.id);
                         return (
                           <button
-                            key={player['Player Name']}
+                            key={player.id}
                             style={{
                               minWidth: 120,
                               background: isSelected ? teamColors[teamKey] : '#eee',
@@ -1028,10 +1030,10 @@ function formatStatsForExport(stats, rosters, gameId) {
                             }}
                             onClick={() => {
                               setSubSelection(prev => {
-                                const already = prev[teamKey]?.some(p => p['Player Name'] === player['Player Name']);
+                                const already = prev[teamKey]?.some(p => p.id === player.id);
                                 let updated;
                                 if (already) {
-                                  updated = prev[teamKey].filter(p => p['Player Name'] !== player['Player Name']);
+                                  updated = prev[teamKey].filter(p => p.id !== player.id);
                                 } else {
                                   updated = [...(prev[teamKey] || []), player];
                                 }
@@ -1139,8 +1141,8 @@ function formatStatsForExport(stats, rosters, gameId) {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRight ? 'flex-end' : 'flex-start', gap: 8 }}>
                       {activePlayers[teamKey].map(player => (
                         <button
-                          key={player['Player Name']}
-                          onClick={() => handleStatClick(player['Player Name'], player.Number)}
+                          key={player.id}
+                          onClick={() => handleStatClick(p.id, player['Player Name'], player.Number)}
                           style={{
                             minWidth: 160,
                             textAlign: isRight ? 'right' : 'left',
@@ -1213,20 +1215,20 @@ function formatStatsForExport(stats, rosters, gameId) {
                     </thead>
                     <tbody>
                       {[...teams[teamKey]].map((p) => (
-                        <tr key={p['Player Name']} className="text-center">
+                        <tr key={p.id} className="text-center">
                           <td>{p.Number}</td>
-                          <td>{p['Player Name']}</td>
-                          <td>{stats[p['Player Name']].points}</td>
-                          <td>{stats[p['Player Name']].fgMade}/{stats[p['Player Name']].fgAttempted}</td>
-                          <td>{stats[p['Player Name']].threeMade}/{stats[p['Player Name']].threeAttempted}</td>
-                          <td>{stats[p['Player Name']].ftMade}/{stats[p['Player Name']].ftAttempted}</td>
-                          <td>{stats[p['Player Name']].offRebounds}</td>
-                          <td>{stats[p['Player Name']].defRebounds}</td>
-                          <td>{stats[p['Player Name']].assists}</td>
-                          <td>{stats[p['Player Name']].steals}</td>
-                          <td>{stats[p['Player Name']].blocks}</td>
-                          <td>{stats[p['Player Name']].fouls}</td>
-                          <td>{stats[p['Player Name']].turnovers}</td>
+                          <td>{p.id}</td>
+                          <td>{stats[p.id].points}</td>
+                          <td>{stats[p.id].fgMade}/{stats[p.id].fgAttempted}</td>
+                          <td>{stats[p.id].threeMade}/{stats[p.id].threeAttempted}</td>
+                          <td>{stats[p.id].ftMade}/{stats[p.id].ftAttempted}</td>
+                          <td>{stats[p.id].offRebounds}</td>
+                          <td>{stats[p.id].defRebounds}</td>
+                          <td>{stats[p.id].assists}</td>
+                          <td>{stats[p.id].steals}</td>
+                          <td>{stats[p.id].blocks}</td>
+                          <td>{stats[p.id].fouls}</td>
+                          <td>{stats[p.id].turnovers}</td>
                         </tr>
                       ))}
                       <tr className="text-center">
@@ -1358,7 +1360,7 @@ function formatStatsForExport(stats, rosters, gameId) {
             }));
             setStats(prev => ({
               ...prev,
-              [newPlayer['Player Name']]: {
+              [newPlayer.id]: {
                 points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
                 blocks: 0, fouls: 0, turnovers: 0,
                 fgMade: 0, fgAttempted: 0,
@@ -1435,13 +1437,7 @@ function formatStatsForExport(stats, rosters, gameId) {
             if (!addPlayerTeam || !addPlayerNumber.trim()) return;
             // Find next unique Unknown N ACROSS BOTH TEAMS
             const allPlayers = [...teams.teamA, ...teams.teamB];
-            let n = 1;
-            let name;
-            do {
-              name = `Unknown ${n}`;
-              n++;
-            } while (allPlayers.some(p => p['Player Name'] === name));
-            const newPlayer = { id: generatePlayerId(), 'Player Name': name, Number: addPlayerNumber.trim() };
+            const newPlayer = { id: generatePlayerId(), 'Player Name': 'Unknown', Number: addPlayerNumber.trim() };
             // Add to teams and rosters, but not activePlayers
             setTeams(prev => ({
               ...prev,
@@ -1456,7 +1452,7 @@ function formatStatsForExport(stats, rosters, gameId) {
             }));
             setStats(prev => ({
               ...prev,
-              [newPlayer['Player Name']]: {
+              [newPlayer.id]: {
                 points: 0, offRebounds: 0, defRebounds: 0, assists: 0, steals: 0,
                 blocks: 0, fouls: 0, turnovers: 0,
                 fgMade: 0, fgAttempted: 0,
@@ -1511,7 +1507,7 @@ function AddPlayerButton({ teamKey, teamName, onAdd }) {
           }}>
             <h3>Add Player to {teamName}</h3>
             <div style={{ marginTop: 8, color: '#6366f1', fontWeight: 500 }}>
-              Enter the player's name and number. Ensure player names are unique.
+              Enter the player's name and number.
             </div>
             <div style={{ marginTop: 16 }}>
               <input

@@ -112,6 +112,7 @@ export default function StatTrackerApp() {
       setTeamNames(teamList);
     }
     fetchData();
+    console.log(teamMap['Zephrhills Christian (FL) -- Boys']);
   }, []);
 
   // Helper to sort players by number (handles string/number gracefully)

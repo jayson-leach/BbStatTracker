@@ -9,7 +9,7 @@ export default function StatTrackerApp() {
   const [rosters, setRosters] = useState({});
   const [matchup, setMatchup] = useState({ home: '', away: '' });
   const [teams, setTeams] = useState({ teamA: [], teamB: [] });
-  const [selectedEvent, setSelectedEvent] = useState({value: null, label: 'Select Event'});
+  const [selectedEvent, setSelectedEvent] = useState({value: null, label: null});
   const [history, setHistory] = useState([]);
   const [period, setPeriod] = useState(1);
   const [selectedStat, setSelectedStat] = useState(null);
@@ -42,8 +42,22 @@ export default function StatTrackerApp() {
 
   // Cache16
   const cache16Teams = [
-    'ALA - Ironwood -- Boys',
-    'ACP 2 -- Girls'
+    'Archbishop Riordan (CA) -- Boys',
+    'Brophy (AZ) -- Boys',
+    'Corner Canyon (UT) -- Boys',
+    'Coronado (NV) -- Boys',
+    'Dublin (CA) -- Boys',
+    'Inderkum (CA) -- Boys',
+    'Millennium (AZ) -- Boys',
+    'Orem (UT) -- Boys',
+    'Owyhee (ID) -- Boys',
+    'Pasadena (CA) -- Boys',
+    'Rancho Christian (CA) -- Boys',
+    'Redondo Union (CA) -- Boys',
+    'Richland (WA) -- Boys',
+    'Saint Mary’s (AZ) -- Boys',
+    'St. John Bosco (CA) -- Boys',
+    'Zephrhills Christian (FL) -- Boys'
   ]
 
   // Reset starter selection when stage changes to 'matchup'

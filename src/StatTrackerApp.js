@@ -60,7 +60,8 @@ export default function StatTrackerApp() {
         const gender = row.Gender?.trim();
         if (!baseName || !gender) return;
         const teamName = `${baseName} -- ${gender}`;
-        if (!teamList.includes(teamName)) teamList.push(teamName);
+        const normTeamName = normalizeTeamName(teamName);
+        if (!teamList.includes(normTeamName)) teamList.push(normTeamName);
       });
 
       const rosterRes = await fetch('/api/getRoster');
@@ -78,10 +79,11 @@ export default function StatTrackerApp() {
         };
         if (!baseName || !gender || !player['Player Name'] || !player.Number) return;
         const teamName = `${baseName} -- ${gender}`;
-        if (!teamMap[teamName]) teamMap[teamName] = [];
+        const normTeamName = normalizeTeamName(teamName);
+        if (!teamMap[normTeamName]) teamMap[normTeamName] = [];
         // Only add if not already present (by id)
-        if (!teamMap[teamName].some(p => p.id === player.id)) {
-          teamMap[teamName].push(player);
+        if (!teamMap[normTeamName].some(p => p.id === player.id)) {
+          teamMap[normTeamName].push(player);
         }
       });
 
@@ -1562,5 +1564,14 @@ function isColorLight(hex) {
 // 1. Helper to generate a unique id (simple timestamp + random)
 function generatePlayerId() {
   return 'p_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+}
+
+function normalizeTeamName(name) {
+  // Remove common suffixes but keep parentheticals and city/state info
+  return name
+    .replace(/\b(high|hs|school|secondary)\b/gi, '') // Remove common suffixes
+    .replace(/\s+/g, ' ') // Collapse multiple spaces
+    .trim()
+    .toLowerCase();
 }
 }

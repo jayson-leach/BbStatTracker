@@ -74,6 +74,7 @@ export default function StatTrackerApp() {
       const rosterData = await rosterRes.json();
       // Format: [{ Team, Gender, 'Player Name', Number }, ...]
       const teamMap = {};
+      const teamList = [];
       rosterData.forEach(row => {
         const baseName = row.Team?.trim();
         const gender = row.Gender?.trim();

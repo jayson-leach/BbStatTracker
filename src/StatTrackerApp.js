@@ -96,22 +96,23 @@ export default function StatTrackerApp() {
           Number: row.Number || row.number || '',
         };
         if (!baseName || !gender || !player['Player Name'] || !player.Number) return;
-        if (baseName == 'Zephrhills Christian (FL)') console.log('Zephrhills player:', player);
         const teamName = `${baseName} -- ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
+        if (teamMap['Zephrhills Christian (FL) -- Boys']) console.log('Zephrhills Christian team found');
         // Only add if not already present (by id)
         if (!teamMap[teamName].some(p => p.id === player.id)) {
           teamMap[teamName].push(player);
         }
+        console.log(teamMap['Zephrhills Christian (FL) -- Boys']);
       });
 
       teamList.forEach(teamName => {
         if (!teamMap[teamName]) teamMap[teamName] = [];
       });
+      console.log(teamList);
 
       setRosters(teamMap);
       setTeamNames(teamList);
-      console.log(teamList, teamMap);
     }
     fetchData();
   }, []);

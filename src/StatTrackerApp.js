@@ -9,7 +9,7 @@ export default function StatTrackerApp() {
   const [rosters, setRosters] = useState({});
   const [matchup, setMatchup] = useState({ home: '', away: '' });
   const [teams, setTeams] = useState({ teamA: [], teamB: [] });
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState({value: null, label: 'Select Event'});
   const [history, setHistory] = useState([]);
   const [period, setPeriod] = useState(1);
   const [selectedStat, setSelectedStat] = useState(null);

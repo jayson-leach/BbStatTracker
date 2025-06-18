@@ -96,6 +96,7 @@ export default function StatTrackerApp() {
           Number: row.Number || row.number || '',
         };
         if (!baseName || !gender || !player['Player Name'] || !player.Number) return;
+        if (baseName == 'Zephrhills Christian (FL)') console.log('Zephrhills player:', player);
         const teamName = `${baseName} -- ${gender}`;
         if (!teamMap[teamName]) teamMap[teamName] = [];
         // Only add if not already present (by id)

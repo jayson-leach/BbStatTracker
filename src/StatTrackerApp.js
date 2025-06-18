@@ -110,7 +110,7 @@ export default function StatTrackerApp() {
 
       setRosters(teamMap);
       setTeamNames(teamList);
-      console.log(rosters['Zephrhills Christian (FL) -- Boys']);
+      console.log(teamList, teamMap);
     }
     fetchData();
   }, []);

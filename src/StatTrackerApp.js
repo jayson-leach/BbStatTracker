@@ -70,18 +70,6 @@ export default function StatTrackerApp() {
   // Fetch teams and rosters from Supabase
   useEffect(() => {
     async function fetchData() {
-      const teamRes = await fetch('/api/getTeams');
-      const teamData = await teamRes.json();
-      // Format: [{ team: 'Lincoln', gender: 'Boys' }, ...]
-      const teamList = [];
-      teamData.forEach(row => {
-        const baseName = row.Team?.trim();
-        const gender = row.Gender?.trim();
-        if (!baseName || !gender) return;
-        const teamName = `${baseName} -- ${gender}`;
-        if (!teamList.includes(teamName)) teamList.push(teamName);
-      });
-
       const rosterRes = await fetch('/api/getRoster');
       const rosterData = await rosterRes.json();
       // Format: [{ Team, Gender, 'Player Name', Number }, ...]
@@ -97,6 +85,7 @@ export default function StatTrackerApp() {
         };
         if (!baseName || !gender || !player['Player Name'] || !player.Number) return;
         const teamName = `${baseName} -- ${gender}`;
+        if (!teamList.includes(teamName)) teamList.push(teamName);
         if (!teamMap[teamName]) teamMap[teamName] = [];
         if (teamMap['Zephrhills Christian (FL) -- Boys']) console.log('Zephrhills Christian team found');
         // Only add if not already present (by id)

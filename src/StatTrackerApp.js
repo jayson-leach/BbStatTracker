@@ -40,6 +40,11 @@ export default function StatTrackerApp() {
   const [subTeamKey, setSubTeamKey] = useState(null);
   const [teamColors, setTeamColors] = useState({ teamA: '#6366f1', teamB: '#f25c5c' });
 
+  // Cache16
+  const cache16Teams = [
+    'ALA - Ironwood -- Boys',
+    'ACP 2 -- Girls'
+  ]
 
   // Reset starter selection when stage changes to 'matchup'
   useEffect(() => {
@@ -128,8 +133,6 @@ export default function StatTrackerApp() {
     return initial;
   });
 
-
-
 // When opening the substitution menu, set subSelection to current activePlayers
 useEffect(() => {
   if (selectedStat && selectedStat.label === 'Substitution') {
@@ -142,8 +145,15 @@ useEffect(() => {
   // eslint-disable-next-line
 }, [selectedStat, activePlayers]);
 
+  // visible team names for Cache16
+  const visibleTeamNames = selectedEvent.label === 'Cache16'
+  ? teamNames.filter(name => {
+      return cache16Teams.includes(name);
+    })
+  : teamNames;
+
   // Prepare team options for the select dropdown
-  const teamOptions = teamNames.sort().map((name) => ({ value: name, label: name }));
+  const teamOptions = visibleTeamNames.sort().map((name) => ({ value: name, label: name }));
 
   // If the stage is 'matchup', render the matchup selection UI
   if (stage === 'matchup') {

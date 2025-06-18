@@ -88,18 +88,15 @@ export default function StatTrackerApp() {
         const teamName = `${baseName} -- ${gender}`;
         if (!teamList.includes(teamName)) teamList.push(teamName);
         if (!teamMap[teamName]) teamMap[teamName] = [];
-        if (teamMap['Zephrhills Christian (FL) -- Boys']) console.log('Zephrhills Christian team found');
         // Only add if not already present (by id)
         if (!teamMap[teamName].some(p => p.id === player.id)) {
           teamMap[teamName].push(player);
         }
-        console.log(teamMap['Zephrhills Christian (FL) -- Boys']);
       });
 
       teamList.forEach(teamName => {
         if (!teamMap[teamName]) teamMap[teamName] = [];
       });
-      console.log(teamList);
 
       setRosters(teamMap);
       setTeamNames(teamList);

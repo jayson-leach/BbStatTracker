@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     }
 
     // 2. For each new row, upsert into destTable
-    for (const row of newRows) {
+    for (const row of sourceRows) {
       const name = row.name;
       // Try to find existing entry
       const { data: existing, error: fetchError } = await supabase

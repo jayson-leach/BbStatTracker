@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { mergeBoxScore } from '../api/mergeBoxScore';
+import { mergeBoxScore } from '../../api/mergeBoxScore';
 import Select from 'react-select';
 import './styles.css';
 

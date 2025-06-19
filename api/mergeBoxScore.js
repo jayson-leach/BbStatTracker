@@ -21,10 +21,12 @@ export default async function handler(req, res) {
   const { sourceTable, destTable } = req.body;
 
   try {
-    // Fetch all rows from the source table
-    const { data: sourceRows, error: sourceError } = await supabase.from(sourceTable).select('*');
-    if (sourceError) throw sourceError;
-    if (!sourceRows || sourceRows.length === 0) return true;
+    // 1. Fetch only new rows (e.g., where merged=false or not in destTable)
+    const { data: newRows, error } = await supabase
+      .from(sourceTable)
+      .select('*')
+      .eq('merged', false)
+    if (error) throw error;
 
     // Combine source rows by team, name, number
     const idCols = ['team', 'name', 'number', 'id', 'game_id', 'created_at'];
@@ -44,25 +46,43 @@ export default async function handler(req, res) {
       }
     }
 
-    // Prepare combined rows, removing game_id and 'Player Name'
-    const combinedRows = Object.values(combined).map(row => {
-      const { game_id, ...rest } = row;
-      return {
-        ...rest,
-        name: row.name,
-      };
-    });
+    // 2. For each new row, upsert into destTable
+    for (const row of newRows) {
+      const name = row.name;
+      // Try to find existing entry
+      const { data: existing, error: fetchError } = await supabase
+        .from(destTable)
+        .select('*')
+        .eq('team', row.team)
+        .eq('name', name)
+        .eq('number', row.number);
 
-    // Efficiently clear the destination table before inserting
-    const { error: deleteError } = await supabase.from(destTable).delete().neq('id', 0);
-    if (deleteError) throw deleteError;
+      const upsertRow = { ...row, name };
+      delete upsertRow['game_id'];
+      delete upsertRow['merged'];
 
-    // Batch insert for large datasets (Supabase/PostgREST limit is 1000 rows per insert)
-    const batchSize = 1000;
-    for (let i = 0; i < combinedRows.length; i += batchSize) {
-      const batch = combinedRows.slice(i, i + batchSize);
-      const { error: insertError } = await supabase.from(destTable).insert(batch);
-      if (insertError) throw insertError;
+      if (fetchError) throw fetchError;
+
+      if (existing && existing.length > 0) {
+        // Sum stats
+        const existingRow = existing[0];
+        Object.keys(upsertRow).forEach(col => {
+          if (
+            !['team', 'name', 'number', 'id'].includes(col) &&
+            typeof upsertRow[col] === 'number'
+          ) {
+            upsertRow[col] = (existingRow[col] || 0) + upsertRow[col];
+          }
+        });
+        // Update existing row
+        await supabase.from(destTable).update(upsertRow).eq('id', existingRow.id);
+      } else {
+        // Insert new row
+        await supabase.from(destTable).insert([upsertRow]);
+      }
+
+      // mark as merged in sourceTable
+      await supabase.from(sourceTable).update({ merged: true }).eq('id', row.id);
     }
   } catch (err) {
     console.error('Unexpected error in mergeBoxScore API:', err);

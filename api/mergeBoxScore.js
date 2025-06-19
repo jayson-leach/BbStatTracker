@@ -45,10 +45,13 @@ export default async function handler(req, res) {
     }
 
     // Standardize to 'name' field
-    const combinedRows = Object.values(combined).map(row => ({
-      ...row,
-      name: row.name,
-    }));
+    const combinedRows = Object.values(combined).map(row => {
+      const { game_id, ...rest } = row;
+      return {
+        ...rest,
+        name: row['Player Name'] || row.name,
+      };
+    });
 
     // Insert combined rows into the destination table
     const { error: insertError } = await supabase.from(destTable).insert(combinedRows);

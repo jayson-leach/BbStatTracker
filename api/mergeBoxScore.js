@@ -21,9 +21,10 @@ export default async function handler(req, res) {
   const { sourceTable, destTable } = req.body;
 
   try {
-      // Fetch all rows from the source table
+    // Fetch all rows from the source table
     const { data: sourceRows, error: sourceError } = await supabase.from(sourceTable).select('*');
     if (sourceError) throw sourceError;
+    if (!sourceRows || sourceRows.length === 0) return true;
 
     // Fetch all rows from the destination table
     const { data: destRows, error: destError } = await supabase.from(destTable).select('*');
@@ -49,6 +50,7 @@ export default async function handler(req, res) {
 
     // For each combined entry, check if it exists in destTable and update or insert
     for (const row of Object.values(combined)) {
+      if (!row) continue;
       const name = row.name;
       const { data: existing, error: fetchError } = await supabase
         .from(destTable)
@@ -69,12 +71,14 @@ export default async function handler(req, res) {
         // Update: sum all stat columns
         const existingRow = existing[0];
         const updatedRow = { ...existingRow };
-        for (const [col, val] of Object.entries(upsertRow)) {
-          if (
-            !['team', 'name', 'number', 'id', 'game_id'].includes(col) &&
-            typeof val === 'number'
-          ) {
-            updatedRow[col] = (existingRow[col] || 0) + val;
+        for (const [col, val] of Object.entries(row)) {
+          if (row && typeof row === 'object') {
+            if (
+              !['team', 'name', 'number', 'id', 'game_id'].includes(col) &&
+              typeof val === 'number'
+            ) {
+              updatedRow[col] = (existingRow[col] || 0) + val;
+            }
           }
         }
         // Update the row in destTable

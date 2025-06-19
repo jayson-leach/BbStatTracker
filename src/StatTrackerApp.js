@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { mergeBoxScore } from './mergeBoxScore';
 import Select from 'react-select';
 import './styles.css';
 
@@ -1281,14 +1279,23 @@ function formatStatsForExport(stats, rosters, gameId) {
                 const result = await response.json();
                 alert(result.message);
 
-                console.log('Calling mergeBoxScore with event:', selectedEvent?.value, selectedEvent?.value + '_merged');
-                mergeBoxScore(selectedEvent?.value, selectedEvent?.value + '_merged')
-                .then(result => console.log('Combined and exported:', result))
-                .catch(err => console.error('Export error:', err));
-
               } catch (err) {
                 console.error('Export failed', err);
                 alert('Failed to export box score');
+              }
+
+              try {
+                const response = await fetch('/api/mergeBoxScore', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ sourceTable: selectedEvent?.value, destTable: selectedEvent?.value + '_merged'}),
+                });
+                console.log('Merge response:', response);
+              } catch (err) {
+                console.error('Merge failed', err);
+                alert('Failed to merge box score');
               }
             }}
           >

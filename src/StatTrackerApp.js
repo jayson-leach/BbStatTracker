@@ -1279,15 +1279,16 @@ function formatStatsForExport(stats, rosters, gameId) {
 
                 const result = await response.json();
                 alert(result.message);
+
+                console.log('Calling mergeBoxScore with event:', selectedEvent?.value, selectedEvent?.value + '_merged');
+                mergeBoxScore(selectedEvent?.value, selectedEvent?.value + '_merged')
+                .then(result => console.log('Combined and exported:', result))
+                .catch(err => console.error('Export error:', err));
+                
               } catch (err) {
                 console.error('Export failed', err);
                 alert('Failed to export box score');
               }
-
-              console.log('Calling mergeBoxScore with event:', selectedEvent?.value, selectedEvent?.value + '_merged');
-              mergeBoxScore(selectedEvent?.value, selectedEvent?.value + '_merged')
-              .then(result => console.log('Combined and exported:', result))
-              .catch(err => console.error('Export error:', err));
             }}
           >
             Export Box Score

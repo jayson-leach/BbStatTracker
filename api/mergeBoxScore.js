@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       } else {
         for (const [col, val] of Object.entries(row)) {
           if (
-            !['team', 'name', 'number', 'id'].includes(col) &&
+            !['team', 'name', 'number', 'id', 'game_id'].includes(col) &&
             typeof val === 'number'
           ) {
             combined[key][col] = (combined[key][col] || 0) + val;
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
         .eq('number', row.number);
 
       // Prepare the upsert row
-      const upsertRow = {
+      const { game_id, upsertRow} = {
         ...row,
         name,
       };
@@ -71,7 +71,7 @@ export default async function handler(req, res) {
         const updatedRow = { ...existingRow };
         for (const [col, val] of Object.entries(upsertRow)) {
           if (
-            !['team', 'name', 'number', 'id'].includes(col) &&
+            !['team', 'name', 'number', 'id', 'game_id'].includes(col) &&
             typeof val === 'number'
           ) {
             updatedRow[col] = (existingRow[col] || 0) + val;

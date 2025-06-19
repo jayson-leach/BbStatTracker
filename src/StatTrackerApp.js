@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { mergeBoxScore } from '/api/mergeBoxScore';
 import Select from 'react-select';
 import './styles.css';
 
@@ -1282,6 +1283,10 @@ function formatStatsForExport(stats, rosters, gameId) {
                 console.error('Export failed', err);
                 alert('Failed to export box score');
               }
+
+              mergeBoxScore(selectedEvent?.value, selectedEvent?.value + '_merged')
+              .then(result => console.log('Combined and exported:', result))
+              .catch(err => console.error('Export error:', err));
             }}
           >
             Export Box Score

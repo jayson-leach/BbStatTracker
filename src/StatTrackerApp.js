@@ -1284,6 +1284,7 @@ function formatStatsForExport(stats, rosters, gameId) {
                 alert('Failed to export box score');
               }
 
+              console.log('Calling mergeBoxScore with event:', selectedEvent?.value, selectedEvent?.value + '_merged');
               mergeBoxScore(selectedEvent?.value, selectedEvent?.value + '_merged')
               .then(result => console.log('Combined and exported:', result))
               .catch(err => console.error('Export error:', err));

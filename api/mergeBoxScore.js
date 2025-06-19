@@ -22,11 +22,12 @@ export default async function handler(req, res) {
 
   try {
     // 1. Fetch only new rows (e.g., where merged=false or not in destTable)
-    const { data: newRows, error } = await supabase
+    const { data: sourceRows, error: sourceTablerror } = await supabase
       .from(sourceTable)
       .select('*')
       .eq('merged', false)
-    if (error) throw error;
+    if (sourceTablerror) throw sourceTablerror;
+    if (!sourceRows || sourceRows.length === 0) return true;
 
     // Combine source rows by team, name, number
     const idCols = ['team', 'name', 'number', 'id', 'game_id', 'created_at'];

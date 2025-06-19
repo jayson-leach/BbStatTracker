@@ -90,7 +90,7 @@ export default async function handler(req, res) {
       await supabase.from(sourceTable).update({ merged: true }).in('id', mergedIds);
     }
 
-    return res.status(200).json({ message: 'Merge complete.' });
+    return res.status(200).json({ message: 'Merge complete. Safe to close.' });
   } catch (err) {
     console.error('Unexpected error in mergeBoxScore API:', err);
     return res.status(500).json({ message: 'Internal server error' });

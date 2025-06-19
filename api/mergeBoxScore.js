@@ -21,25 +21,21 @@ export default async function handler(req, res) {
   const { sourceTable, destTable } = req.body;
 
   try {
-    // Fetch all rows from the source table
-    const { data: sourceRows, error: sourceError } = await supabase.from(sourceTable).select('*');
-    if (sourceError) throw sourceError;
-    if (!sourceRows || sourceRows.length === 0) return true;
+      // Fetch all rows from the source table (like exportBoxScore)
+    const { data: rows, error } = await supabase.from(sourceTable).select('*');
+    if (error) throw error;
 
-    // Fetch all rows from the destination table
-    const { data: destRows, error: destError } = await supabase.from(destTable).select('*');
-    if (destError) throw destError;
-
-    // Combine source rows by team, name, number
+    // Combine rows by team, name, number
     const combined = {};
-    for (const row of sourceRows) {
+    for (const row of rows) {
       const key = `${row.team}||${row.name}||${row.number}`;
       if (!combined[key]) {
         combined[key] = { ...row };
       } else {
+        // Sum all integer/stat columns except team, name, number, id
         for (const [col, val] of Object.entries(row)) {
           if (
-            !['team', 'name', 'number', 'id', 'game_id'].includes(col) &&
+            !['team', 'name', 'number', 'id'].includes(col) &&
             typeof val === 'number'
           ) {
             combined[key][col] = (combined[key][col] || 0) + val;
@@ -48,51 +44,23 @@ export default async function handler(req, res) {
       }
     }
 
-    // For each combined entry, check if it exists in destTable and update or insert
-    for (const row of Object.values(combined)) {
-      if (!row) continue;
-      const name = row.name;
-      const { data: existing, error: fetchError } = await supabase
-        .from(destTable)
-        .select('*')
-        .eq('team', row.team)
-        .eq('name', name)
-        .eq('number', row.number);
-
-      // Prepare the upsert row
-      const { game_id, upsertRow} = {
-        ...row,
-        name,
+    // Standardize to 'name' field
+    const combinedRows = Object.values(combined).map(row => {
+      const { game_id, ...rest } = row;
+      return {
+        ...rest,
+        name: row.name,
       };
+    });
 
-      if (fetchError) throw fetchError;
+    // Clear the destination table before inserting
+    const { error: deleteError } = await supabase.from(destTable).delete().neq('id', 0);
+    if (deleteError) throw deleteError;
 
-      if (existing && existing.length > 0) {
-        // Update: sum all stat columns
-        const existingRow = existing[0];
-        const updatedRow = { ...existingRow };
-        for (const [col, val] of Object.entries(row)) {
-          if (row && typeof row === 'object') {
-            if (
-              !['team', 'name', 'number', 'id', 'game_id'].includes(col) &&
-              typeof val === 'number'
-            ) {
-              updatedRow[col] = (existingRow[col] || 0) + val;
-            }
-          }
-        }
-        // Update the row in destTable
-        const { error: updateError } = await supabase
-          .from(destTable)
-          .update(updatedRow)
-          .eq('id', existingRow.id);
-        if (updateError) throw updateError;
-      } else {
-        // Insert new row
-        const { error: insertError } = await supabase.from(destTable).insert([upsertRow]);
-        if (insertError) throw insertError;
-      }
-    }
+    // Insert combined rows into the destination table
+    const { error: insertError } = await supabase.from(destTable).insert(combinedRows);
+    if (insertError) throw insertError;
+    
 } catch (err) {
     console.error('Unexpected error in mergeBoxScore API:', err);
     return res.status(500).json({ message: 'Internal server error' });

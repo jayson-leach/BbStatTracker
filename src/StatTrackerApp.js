@@ -1292,7 +1292,9 @@ function formatStatsForExport(stats, rosters, gameId) {
                   },
                   body: JSON.stringify({ sourceTable: selectedEvent?.value, destTable: selectedEvent?.value + '_merged'}),
                 });
-                console.log('Merge response:', response);
+
+                const result = await response.json();
+                alert(result.message);
               } catch (err) {
                 console.error('Merge failed', err);
                 alert('Failed to merge box score');

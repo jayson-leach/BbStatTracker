@@ -1,11 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
 /**
  * Export and combine stats from one table to another.
  * Combines rows by player, team, and number, summing all other integer columns.
@@ -13,6 +7,12 @@ const supabase = createClient(
  * @param {string} destTable - The destination table name.
  */
 export async function mergeBoxScore(sourceTable, destTable) {
+  // Initialize Supabase client
+  const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+
   // 1. Fetch all rows from the source table
   const { data: rows, error } = await supabase.from(sourceTable).select('*');
   if (error) throw error;

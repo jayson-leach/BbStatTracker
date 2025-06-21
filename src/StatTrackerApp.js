@@ -915,10 +915,11 @@ function formatStatsForExport(stats, rosters, gameId) {
         break;
       }
     }
+    const teamName = teamKey ? teamKey.split(' -- ')[0] : '';
 
     allStats.push({
       game_id: gameId,
-      team: teamKey.split(' -- ')[0], // Get team name without Boys / Girls
+      team: teamName, // Get team name without Boys / Girls
       name: playerName,
       number: number,
       points: playerStats.points || 0,

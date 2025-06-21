@@ -1283,22 +1283,6 @@ function formatStatsForExport(stats, rosters, gameId) {
                 console.error('Export failed', err);
                 alert('Failed to export box score');
               }
-
-              try {
-                const response = await fetch('/api/mergeBoxScore', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ sourceTable: selectedEvent?.value, destTable: selectedEvent?.value + '_merged'}),
-                });
-
-                const result = await response.json();
-                alert(result.message);
-              } catch (err) {
-                console.error('Merge failed', err);
-                alert('Failed to merge box score');
-              }
             }}
           >
             Export Box Score

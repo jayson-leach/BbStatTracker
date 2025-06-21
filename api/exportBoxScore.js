@@ -29,7 +29,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ message: 'Failed to insert into database' });
     }
 
-    return res.status(200).json({ message: 'Box score exported successfully. Wait for merge...' });
+    return res.status(200).json({ message: 'Box score exported successfully. Safe to close.' });
   } catch (err) {
     console.error('Unexpected error in exportBoxScore API:', err);
     return res.status(500).json({ message: 'Internal server error' });

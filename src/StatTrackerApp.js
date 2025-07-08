@@ -172,9 +172,6 @@ useEffect(() => {
       <p>Select Event</p>
     <Select
       options={[
-        { value: 'box_scores_section_7', label: 'Section 7 - 2025' },
-        { value: 'box_scores_cache16', label: 'Cache16' },
-        { value: 'box_scores_test', label: 'Test' }
       ]}
       value={selectedEvent}
       onChange={(option) => setSelectedEvent(option)}
